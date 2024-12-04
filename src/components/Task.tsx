@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { deleteTask, TaskType } from "../../features/tasks/tasksSlice";
+import { deleteTask, TaskType } from "../features/tasks/tasksSlice";
 
 interface TaskProps {
   task: TaskType;
