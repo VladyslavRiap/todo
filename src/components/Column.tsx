@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import Task from "./Task";
+import Task from "./modal/Task";
 import { TaskType } from "../features/tasks/tasksSlice";
 
 interface ColumnProps {
