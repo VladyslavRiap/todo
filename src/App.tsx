@@ -3,39 +3,55 @@
 import { useState } from "react";
 import Column from "./components/Column";
 import { useDispatch } from "react-redux";
-import { addTask, TaskType } from "./features/tasks/tasksSlice";
-import Modal from "./components/modal/Modal";
+import { addTask, editTask, TaskType } from "./features/tasks/tasksSlice";
+import Modal from "./components/Modal";
+
+const columnStatuses = [
+  { status: "todo" as TaskType["status"], title: "To Do" },
+  { status: "inProgress" as TaskType["status"], title: "In Progress" },
+  { status: "done" as TaskType["status"], title: "Done" },
+];
 
 const App = () => {
   const [modalIsOpern, setModolIsOpen] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<TaskType | null>(null);
   const dispatch = useDispatch();
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (task?: TaskType) => {
+    task ? setTaskToEdit(task) : setTaskToEdit(null);
+
     setModolIsOpen(true);
   };
 
   const handleCloseModal = () => {
     setModolIsOpen(false);
+    setTaskToEdit(null);
   };
 
   const SaveOpenModal = (task: TaskType) => {
-    dispatch(addTask(task));
+    taskToEdit ? dispatch(editTask(task)) : dispatch(addTask(task));
   };
 
   return (
     <div>
       <div>
-        <button onClick={handleOpenModal}> Add New Task</button>
+        <button onClick={() => handleOpenModal()}> Add New Task</button>
         <Modal
           isOpen={modalIsOpern}
           onClose={handleCloseModal}
           onSave={SaveOpenModal}
+          taskToEdit={taskToEdit}
         ></Modal>
       </div>
       <div className="columns">
-        <Column status="todo" title="To Do" />
-        <Column status="inProgress" title="In Progress" />
-        <Column status="done" title="Done" />
+        {columnStatuses.map((column) => (
+          <Column
+            key={column.status}
+            status={column.status}
+            title={column.title}
+            onEditTask={handleOpenModal}
+          ></Column>
+        ))}
       </div>{" "}
     </div>
   );

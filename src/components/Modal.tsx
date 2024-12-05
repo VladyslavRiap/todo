@@ -1,19 +1,43 @@
-import React, { useState } from "react";
-import { TaskType } from "../../features/tasks/tasksSlice";
+import React, { useEffect, useState } from "react";
+import { TaskType } from "../features/tasks/tasksSlice";
 import { v1 } from "uuid";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: TaskType) => void;
+  taskToEdit?: TaskType | null;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
+const predefinedTags = ["Work", "Private", "Studying", "Shopping"];
+
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  onSave,
+  taskToEdit,
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [deadline, setDeadline] = useState("");
   const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
+
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setDescription(taskToEdit.description);
+      setTags(taskToEdit.tags);
+      setDeadline(taskToEdit.deadline);
+      setPriority(taskToEdit.priority);
+    } else {
+      setTitle("");
+      setDescription("");
+      setTags([]);
+      setDeadline("");
+      setPriority("medium");
+    }
+  }, [taskToEdit]);
 
   if (!isOpen) return null;
 
@@ -23,16 +47,25 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
       return;
     }
     const newTask: TaskType = {
-      id: v1(),
+      id: taskToEdit ? taskToEdit.id : v1(),
       title,
       description,
       tags,
       deadline,
       priority,
-      status: "todo",
+      status: taskToEdit ? taskToEdit.status : "todo",
     };
     onSave(newTask);
     onClose();
+  };
+
+  const toggleTag = (tag: string) => {
+    debugger;
+    setTags((prevTags) =>
+      prevTags.includes(tag)
+        ? prevTags.filter((t) => t !== tag)
+        : [...prevTags, tag]
+    );
   };
 
   return (
@@ -41,7 +74,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
         <span className="close" onClick={onClose}>
           &times;
         </span>
-        <h2>Add New Task</h2>
+        <h2>{taskToEdit ? "Edit Task" : "Add New Task"}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -66,13 +99,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
           </label>
           <label>
             Tags:
-            <input
-              type="text"
-              value={tags.join(", ")}
-              onChange={(e) =>
-                setTags(e.target.value.split(",").map((tag) => tag.trim()))
-              }
-            />
+            <div>
+              {predefinedTags.map((tag) => (
+                <button
+                  type="button"
+                  key={tag}
+                  className={tags.includes(tag) ? "tag selected" : "tag"}
+                  onClick={() => toggleTag(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
           </label>
           <label>
             Deadline:
@@ -90,12 +128,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave }) => {
                 setPriority(e.target.value as "high" | "medium" | "low")
               }
             >
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
             </select>
           </label>
-          <button type="submit">Save Task</button>
+          <button type="submit">{taskToEdit ? "editTask" : "Save Task"}</button>
         </form>
       </div>
     </div>
