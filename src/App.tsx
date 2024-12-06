@@ -1,9 +1,6 @@
-// src/App.tsx
-
-import { useState } from "react";
 import Column from "./components/Column";
-import { useDispatch } from "react-redux";
-import { addTask, editTask, TaskType } from "./features/tasks/tasksSlice";
+import { TaskType } from "./features/tasks/tasksSlice";
+import { useModal } from "./contexts/ModalContext";
 import Modal from "./components/Modal";
 
 const columnStatuses = [
@@ -13,35 +10,14 @@ const columnStatuses = [
 ];
 
 const App = () => {
-  const [modalIsOpern, setModolIsOpen] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<TaskType | null>(null);
-  const dispatch = useDispatch();
-
-  const handleOpenModal = (task?: TaskType) => {
-    task ? setTaskToEdit(task) : setTaskToEdit(null);
-
-    setModolIsOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModolIsOpen(false);
-    setTaskToEdit(null);
-  };
-
-  const SaveOpenModal = (task: TaskType) => {
-    taskToEdit ? dispatch(editTask(task)) : dispatch(addTask(task));
-  };
+  const modalContext = useModal();
+  const { handleOpenModal } = modalContext;
 
   return (
     <div>
       <div>
-        <button onClick={() => handleOpenModal()}> Add New Task</button>
-        <Modal
-          isOpen={modalIsOpern}
-          onClose={handleCloseModal}
-          onSave={SaveOpenModal}
-          taskToEdit={taskToEdit}
-        ></Modal>
+        <button onClick={() => handleOpenModal()}>Add New Task</button>
+        <Modal />
       </div>
       <div className="columns">
         {columnStatuses.map((column) => (
@@ -49,10 +25,9 @@ const App = () => {
             key={column.status}
             status={column.status}
             title={column.title}
-            onEditTask={handleOpenModal}
-          ></Column>
+          />
         ))}
-      </div>{" "}
+      </div>
     </div>
   );
 };

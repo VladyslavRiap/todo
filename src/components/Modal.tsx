@@ -1,84 +1,50 @@
-import React, { useEffect, useState } from "react";
-import { TaskType } from "../features/tasks/tasksSlice";
-import { v1 } from "uuid";
+import React, { useRef } from "react";
+import { useModal } from "../contexts/ModalContext";
 
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (task: TaskType) => void;
-  taskToEdit?: TaskType | null;
-}
+interface ModalProps {}
 
 const predefinedTags = ["Work", "Private", "Studying", "Shopping"];
 
-const Modal: React.FC<ModalProps> = ({
-  isOpen,
-  onClose,
-  onSave,
-  taskToEdit,
-}) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [deadline, setDeadline] = useState("");
-  const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
+const Modal: React.FC<ModalProps> = () => {
+  const modalContext = useModal();
+  const {
+    modals,
+    closeModal,
+    handleSaveTask,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    tags,
+    deadline,
+    setDeadline,
+    priority,
+    setPriority,
+    toggleTag,
+    taskToEdit,
+  } = modalContext;
 
-  useEffect(() => {
-    if (taskToEdit) {
-      setTitle(taskToEdit.title);
-      setDescription(taskToEdit.description);
-      setTags(taskToEdit.tags);
-      setDeadline(taskToEdit.deadline);
-      setPriority(taskToEdit.priority);
-    } else {
-      setTitle("");
-      setDescription("");
-      setTags([]);
-      setDeadline("");
-      setPriority("medium");
-    }
-  }, [taskToEdit]);
+  const currentModal = modals.length > 0 ? modals[0] : null;
+  const isOpen = !!currentModal;
 
-  if (!isOpen) return null;
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  const handleSave = () => {
-    if (title.trim() === "") {
-      alert("Title is required");
-      return;
-    }
-    const newTask: TaskType = {
-      id: taskToEdit ? taskToEdit.id : v1(),
-      title,
-      description,
-      tags,
-      deadline,
-      priority,
-      status: taskToEdit ? taskToEdit.status : "todo",
-    };
-    onSave(newTask);
-    onClose();
-  };
-
-  const toggleTag = (tag: string) => {
-    debugger;
-    setTags((prevTags) =>
-      prevTags.includes(tag)
-        ? prevTags.filter((t) => t !== tag)
-        : [...prevTags, tag]
-    );
-  };
+  if (!isOpen || !currentModal) return null;
 
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <span className="close" onClick={onClose}>
+    <div className={`modal-overlay ${isOpen ? "open" : ""}`}>
+      <div className="modal-content" ref={modalRef}>
+        <span
+          className="close"
+          onClick={() => currentModal && closeModal(currentModal.id)}
+        >
           &times;
         </span>
         <h2>{taskToEdit ? "Edit Task" : "Add New Task"}</h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSave();
+            handleSaveTask();
           }}
         >
           <label>
@@ -133,7 +99,9 @@ const Modal: React.FC<ModalProps> = ({
               <option value="low">Low</option>
             </select>
           </label>
-          <button type="submit">{taskToEdit ? "editTask" : "Save Task"}</button>
+          <button type="submit">
+            {taskToEdit ? "Edit Task" : "Save Task"}
+          </button>
         </form>
       </div>
     </div>

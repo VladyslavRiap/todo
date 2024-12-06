@@ -7,10 +7,9 @@ import { TaskType } from "../features/tasks/tasksSlice";
 interface ColumnProps {
   status: TaskType["status"];
   title: string;
-  onEditTask: (task: TaskType) => void;
 }
 
-const Column: React.FC<ColumnProps> = ({ status, title, onEditTask }) => {
+const Column: React.FC<ColumnProps> = ({ status, title }) => {
   const tasks = useSelector((state: RootState) =>
     state.tasks.tasks.filter((task) => task.status === status)
   );
@@ -20,7 +19,7 @@ const Column: React.FC<ColumnProps> = ({ status, title, onEditTask }) => {
       <h2>{title}</h2>
       <div>
         {tasks.map((task) => (
-          <Task key={task.id} task={task} onEditTask={onEditTask} />
+          <Task key={task.id} task={task} />
         ))}
       </div>
     </div>
