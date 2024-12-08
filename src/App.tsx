@@ -1,7 +1,7 @@
+import { Button } from "@mui/material";
 import Column from "./components/Column";
 import { TaskType } from "./features/tasks/tasksSlice";
-import { useModal } from "./contexts/ModalContext";
-import Modal from "./components/Modal";
+import { TASK_MODAL_ID, useModal } from "./contexts/ModalContext";
 
 const columnStatuses = [
   { status: "todo" as TaskType["status"], title: "To Do" },
@@ -9,15 +9,20 @@ const columnStatuses = [
   { status: "done" as TaskType["status"], title: "Done" },
 ];
 
-const App = () => {
-  const modalContext = useModal();
-  const { handleOpenModal } = modalContext;
-
+const App2 = () => {
+  const { modal, openModal } = useModal();
+  console.log(modal, openModal);
   return (
     <div>
       <div>
-        <button onClick={() => handleOpenModal()}>Add New Task</button>
-        <Modal />
+        <Button
+          onClick={() =>
+            openModal(TASK_MODAL_ID, { title: "New Task", button: "Add Task" })
+          }
+          variant="contained"
+        >
+          Add New Task
+        </Button>
       </div>
       <div className="columns">
         {columnStatuses.map((column) => (
@@ -32,4 +37,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App2;

@@ -10,6 +10,7 @@ interface ColumnProps {
 }
 
 const Column: React.FC<ColumnProps> = ({ status, title }) => {
+  debugger;
   const tasks = useSelector((state: RootState) =>
     state.tasks.tasks.filter((task) => task.status === status)
   );
