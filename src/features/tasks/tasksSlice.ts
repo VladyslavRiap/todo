@@ -8,7 +8,7 @@ export interface TaskType {
   tags: string[];
   deadline: string;
   priority: "high" | "medium" | "low";
-  status: "todo" | "inProgress" | "done";
+  status: "done" | "inProgress" | "todo";
 }
 
 interface taskState {

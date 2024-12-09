@@ -1,7 +1,18 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import {
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Typography,
+  Chip,
+  Box,
+  Tooltip,
+} from "@mui/material";
 import { deleteTask, TaskType } from "../features/tasks/tasksSlice";
 import { TASK_MODAL_ID, useModal } from "../contexts/ModalContext";
+import { useDrag } from "react-dnd";
 
 interface TaskProps {
   task: TaskType;
@@ -23,21 +34,60 @@ const Task: React.FC<TaskProps> = ({ task }) => {
     });
   };
 
+  const [{ isDragging }, dragRef] = useDrag({
+    type: "task",
+    item: task,
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
+
   return (
-    <div className="task">
-      <h3>Title: {task.title}</h3>
-      <p>description: {task.description}</p>
-      <p>priority: {task.priority}</p>
-      {task.deadline && <p>deadline: {task.deadline}</p>}
-      {task.tags.map((tag) => (
-        <span key={tag} className="tag">
-          {tag}
-        </span>
-      ))}
-      <div></div>
-      <button onClick={handleDelete}>delete</button>
-      <button onClick={handleEdit}>Edit</button>
-    </div>
+    <Tooltip title="Move me ">
+      <Card
+        ref={dragRef}
+        style={{
+          marginBottom: "16px",
+          border: "0.1px solid black",
+          opacity: isDragging ? 0.5 : 1,
+          backgroundColor: isDragging ? "#bdbdbd" : "white",
+          transition: "background-color     0.3s ease",
+          cursor: "pointer",
+        }}
+      >
+        <CardContent>
+          <Typography variant="h6">Title: {task.title}</Typography>
+          <Typography variant="body2">
+            Description: {task.description}
+          </Typography>
+          <Typography variant="body2">Priority: {task.priority}</Typography>
+          {task.deadline && (
+            <Typography variant="body2">Deadline: {task.deadline}</Typography>
+          )}
+          <Box>
+            {task.tags.map((tag) => (
+              <Chip
+                key={tag}
+                label={tag}
+                style={{ marginRight: "4px", marginBottom: "4px" }}
+              />
+            ))}
+          </Box>
+        </CardContent>
+        <CardActions
+          style={{ display: "flex", justifyContent: "space-between" }}
+        >
+          <Button size="small" color="secondary" onClick={handleDelete}>
+            Delete
+          </Button>
+          <Box marginLeft="auto">
+            <Button size="small" color="primary" onClick={handleEdit}>
+              Edit
+            </Button>
+          </Box>
+        </CardActions>
+      </Card>
+    </Tooltip>
   );
 };
 

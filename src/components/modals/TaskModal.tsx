@@ -43,7 +43,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   onClose,
 }) => {
   const { closeModal, addTaskToList, openModal } = useModal();
-  const [showConfirm, setShowConfirm] = useState(false);
+
   const [taskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -75,7 +75,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
     if (onClose) onClose();
   };
   const handleEdit = () => {
-    setShowConfirm(true);
     openModal(CONFIRM_MODAL_ID, {
       message: "are you confirm?",
       onConfirm: handleConfirm,
@@ -84,11 +83,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
   };
   const handleConfirm = () => {
     handleSave();
-    setShowConfirm(false);
+
     closeModal(CONFIRM_MODAL_ID);
   };
   const handleCancelConfirm = () => {
-    setShowConfirm(false);
     closeModal(CONFIRM_MODAL_ID);
   };
   const handleFormat = (

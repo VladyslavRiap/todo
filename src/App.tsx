@@ -1,7 +1,8 @@
-import { Button } from "@mui/material";
+import { Box, Button, Container, Grid } from "@mui/material";
 import Column from "./components/Column";
 import { TaskType } from "./features/tasks/tasksSlice";
 import { TASK_MODAL_ID, useModal } from "./contexts/ModalContext";
+import CustomDragLayer from "./components/CustomDragLayer";
 
 const columnStatuses = [
   { status: "todo" as TaskType["status"], title: "To Do" },
@@ -10,11 +11,11 @@ const columnStatuses = [
 ];
 
 const App2 = () => {
-  const { modal, openModal } = useModal();
-  console.log(modal, openModal);
+  const { openModal } = useModal();
+
   return (
-    <div>
-      <div>
+    <Container>
+      <Box mb={2}>
         <Button
           onClick={() =>
             openModal(TASK_MODAL_ID, { title: "New Task", button: "Add Task" })
@@ -23,17 +24,16 @@ const App2 = () => {
         >
           Add New Task
         </Button>
-      </div>
-      <div className="columns">
+      </Box>
+      <Grid container spacing={3}>
         {columnStatuses.map((column) => (
-          <Column
-            key={column.status}
-            status={column.status}
-            title={column.title}
-          />
+          <Grid item xs={12} md={4} key={column.status}>
+            <Column status={column.status} title={column.title} />
+          </Grid>
         ))}
-      </div>
-    </div>
+      </Grid>
+      <CustomDragLayer />
+    </Container>
   );
 };
 

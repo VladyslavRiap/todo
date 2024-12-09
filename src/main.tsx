@@ -4,11 +4,14 @@ import App2 from "./App";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { ModalProvider } from "./contexts/ModalContext";
-
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <ModalProvider>
-      <App2 />
+      <DndProvider backend={HTML5Backend}>
+        <App2 />
+      </DndProvider>
     </ModalProvider>
   </Provider>
 );
