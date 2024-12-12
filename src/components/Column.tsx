@@ -1,43 +1,94 @@
-import React from "react";
+import React, { CSSProperties, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Paper, Typography, Box } from "@mui/material";
 import { RootState } from "../store/store";
 import Task from "./Task";
-import { changeTaskStatus, TaskType } from "../features/tasks/tasksSlice";
-import { useDrop } from "react-dnd";
+import { TaskType } from "../features/tasks/tasksSlice";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { ColumnType } from "./utils/dragAndDrop";
 
 interface ColumnProps {
   status: TaskType["status"];
   title: string;
+  column: ColumnType;
+  tasks: TaskType[];
 }
 
-const Column: React.FC<ColumnProps> = ({ status, title }) => {
+const Column: React.FC<ColumnProps> = ({ status, title, column, tasks }) => {
   const dispatch = useDispatch();
-  const tasks = useSelector((state: RootState) =>
-    state.tasks.tasks.filter((task) => task.status === status)
-  );
 
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: "task",
-    drop: (item: TaskType) => {
-      dispatch(changeTaskStatus({ id: item.id, status }));
+  const tasksIds = useMemo(() => {
+    return tasks.map((task) => task.id);
+  }, [tasks]);
+
+  const {
+    setNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: status,
+    data: {
+      type: "column",
+      column,
     },
-    collect: (monitor) => ({ isOver: !!monitor.isOver() }),
-  }));
+  });
+
+  const style: CSSProperties = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+    zIndex: 30,
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: 1,
+    backgroundColor: isDragging ? "rgba(255, 255, 255, 0.8)" : "inherit",
+    border: isDragging ? "2px solid rgb(243, 58, 106)" : "none",
+    minWidth: "300px",
+    minHeight: isDragging ? "300px" : "none",
+    height: "100%",
+    cursor: "pointer",
+  };
+
+  if (isDragging) {
+    return (
+      <Paper
+        variant="outlined"
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        style={style}
+      />
+    );
+  }
 
   return (
     <Paper
-      ref={drop}
-      elevation={isOver ? 24 : 3}
-      style={{ padding: "16px", marginBottom: "16px" }}
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={style}
+      elevation={isDragging ? 16 : 1}
     >
       <Typography variant="h6" gutterBottom>
         {title}
       </Typography>
-      <Box>
-        {tasks.map((task) => (
-          <Task key={task.id} task={task} />
-        ))}
+      <Box
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          height: "100%",
+          overflowY: "auto",
+        }}
+      >
+        <SortableContext items={tasksIds}>
+          {tasks.map((task) => (
+            <Task key={task.id} task={task} />
+          ))}
+        </SortableContext>
       </Box>
     </Paper>
   );

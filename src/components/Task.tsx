@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { useDispatch } from "react-redux";
 import {
   Card,
@@ -8,14 +8,14 @@ import {
   Typography,
   Chip,
   Box,
-  Tooltip,
 } from "@mui/material";
 import { deleteTask, TaskType } from "../features/tasks/tasksSlice";
 import { TASK_MODAL_ID, useModal } from "../contexts/ModalContext";
-import { useDrag } from "react-dnd";
-
-interface TaskProps {
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+export interface TaskProps {
   task: TaskType;
+  isPreview?: boolean;
 }
 
 const Task: React.FC<TaskProps> = ({ task }) => {
@@ -33,61 +33,73 @@ const Task: React.FC<TaskProps> = ({ task }) => {
       taskToEdit: task,
     });
   };
-
-  const [{ isDragging }, dragRef] = useDrag({
-    type: "task",
-    item: task,
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
+  const {
+    setNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: task.id,
+    data: {
+      type: "task",
+      task,
+    },
   });
 
-  return (
-    <Tooltip title="Move me ">
+  const style: CSSProperties = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+    backgroundColor: isDragging ? "rgba(255, 255, 255, 0.8)" : "inherit",
+    border: isDragging ? "2px solid 	rgb(243, 58, 106)" : "none",
+    opacity: isDragging ? 0.5 : 1,
+
+    minWidth: "300px",
+    minHeight: "150px",
+  };
+  if (isDragging) {
+    return (
       <Card
-        ref={dragRef}
-        style={{
-          marginBottom: "16px",
-          border: "0.1px solid black",
-          opacity: isDragging ? 0.5 : 1,
-          backgroundColor: isDragging ? "#bdbdbd" : "white",
-          transition: "background-color     0.3s ease",
-          cursor: "pointer",
-        }}
-      >
-        <CardContent>
-          <Typography variant="h6">Title: {task.title}</Typography>
-          <Typography variant="body2">
-            Description: {task.description}
-          </Typography>
-          <Typography variant="body2">Priority: {task.priority}</Typography>
-          {task.deadline && (
-            <Typography variant="body2">Deadline: {task.deadline}</Typography>
-          )}
-          <Box>
-            {task.tags.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                style={{ marginRight: "4px", marginBottom: "4px" }}
-              />
-            ))}
-          </Box>
-        </CardContent>
-        <CardActions
-          style={{ display: "flex", justifyContent: "space-between" }}
-        >
-          <Button size="small" color="secondary" onClick={handleDelete}>
-            Delete
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        style={style}
+      ></Card>
+    );
+  }
+
+  return (
+    <Card ref={setNodeRef} {...attributes} {...listeners} style={style}>
+      <CardContent className="card-content">
+        <Typography variant="h6">Title: {task.title}</Typography>
+        <Typography variant="body2">Description: {task.description}</Typography>
+        <Typography variant="body2">Priority: {task.priority}</Typography>
+        {task.deadline && (
+          <Typography variant="body2">Deadline: {task.deadline}</Typography>
+        )}
+        <Box>
+          {task.tags.map((tag) => (
+            <Chip
+              key={tag}
+              label={tag}
+              style={{ marginRight: "4px", marginBottom: "4px" }}
+            />
+          ))}
+        </Box>
+      </CardContent>
+
+      <CardActions style={{ display: "flex" }}>
+        <Button size="small" color="secondary" onClick={handleDelete}>
+          Delete
+        </Button>
+        <Box marginLeft="auto">
+          <Button size="small" color="primary" onClick={handleEdit}>
+            Edit
           </Button>
-          <Box marginLeft="auto">
-            <Button size="small" color="primary" onClick={handleEdit}>
-              Edit
-            </Button>
-          </Box>
-        </CardActions>
-      </Card>
-    </Tooltip>
+        </Box>
+      </CardActions>
+    </Card>
   );
 };
 

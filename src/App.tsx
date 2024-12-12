@@ -1,40 +1,124 @@
-import { Box, Button, Container, Grid } from "@mui/material";
+import { Box, Button, Container } from "@mui/material";
 import Column from "./components/Column";
 import { TaskType } from "./features/tasks/tasksSlice";
 import { TASK_MODAL_ID, useModal } from "./contexts/ModalContext";
-import CustomDragLayer from "./components/CustomDragLayer";
+import { useMemo } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
+import { createPortal } from "react-dom";
 
-const columnStatuses = [
+import Task from "./components/Task";
+import { useSelector } from "react-redux";
+import { RootState } from "./store/store";
+import { useEffect } from "react";
+import { useDragAndDrop, ColumnType } from "./components/utils/dragAndDrop";
+
+const columnStatuses: ColumnType[] = [
   { status: "todo" as TaskType["status"], title: "To Do" },
   { status: "inProgress" as TaskType["status"], title: "In Progress" },
   { status: "done" as TaskType["status"], title: "Done" },
 ];
 
-const App2 = () => {
+const App = () => {
   const { openModal } = useModal();
+
+  const tasksFromRedux = useSelector((state: RootState) => state.tasks.tasks);
+  const {
+    columns,
+    activeColumn,
+    activeTask,
+    tasks,
+    setTasks,
+    onDragStart,
+    onDragOver,
+    onDragEnd,
+  } = useDragAndDrop(tasksFromRedux, columnStatuses);
+
+  const columnsId = useMemo(() => columns.map((col) => col.status), [columns]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
+  );
+
+  useEffect(() => {
+    setTasks(tasksFromRedux);
+  }, [tasksFromRedux]);
 
   return (
     <Container>
       <Box mb={2}>
         <Button
           onClick={() =>
-            openModal(TASK_MODAL_ID, { title: "New Task", button: "Add Task" })
+            openModal(TASK_MODAL_ID, {
+              title: "New Task",
+              button: "Add Task",
+            })
           }
           variant="contained"
         >
           Add New Task
         </Button>
       </Box>
-      <Grid container spacing={3}>
-        {columnStatuses.map((column) => (
-          <Grid item xs={12} md={4} key={column.status}>
-            <Column status={column.status} title={column.title} />
-          </Grid>
-        ))}
-      </Grid>
-      <CustomDragLayer />
+      <DndContext
+        sensors={sensors}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+      >
+        <Box
+          style={{
+            zIndex: 0,
+            display: "flex",
+            gap: "16px",
+            height: "calc(100vh - 200px)",
+          }}
+        >
+          <SortableContext items={columnsId}>
+            {columns.map((column) => (
+              <Box
+                key={column.status}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <Column
+                  column={column}
+                  status={column.status}
+                  title={column.title}
+                  tasks={tasks.filter((task) => task.status === column.status)}
+                />
+              </Box>
+            ))}
+          </SortableContext>
+        </Box>
+        {createPortal(
+          <DragOverlay>
+            {activeColumn && (
+              <Column
+                column={activeColumn}
+                status={activeColumn.status}
+                title={activeColumn.title}
+                tasks={tasks.filter(
+                  (task) => task.status === activeColumn.status
+                )}
+              />
+            )}
+            {activeTask && <Task task={activeTask} />}
+          </DragOverlay>,
+          document.body
+        )}
+      </DndContext>
     </Container>
   );
 };
 
-export default App2;
+export default App;

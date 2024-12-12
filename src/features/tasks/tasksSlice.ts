@@ -11,7 +11,7 @@ export interface TaskType {
   status: "done" | "inProgress" | "todo";
 }
 
-interface taskState {
+export interface taskState {
   tasks: TaskType[];
 }
 const initialState: taskState = {
@@ -36,19 +36,32 @@ const tasksSlice = createSlice({
     deleteTask(state, action: PayloadAction<string>) {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
-    changeTaskStatus(
+    reorderTasks: (
+      state,
+      action: PayloadAction<{ activeId: string; overId: string }>
+    ) => {
+      const { activeId, overId } = action.payload;
+      const oldIndex = state.tasks.findIndex((task) => task.id === activeId);
+      const newIndex = state.tasks.findIndex((task) => task.id === overId);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const [movedTask] = state.tasks.splice(oldIndex, 1);
+        state.tasks.splice(newIndex, 0, movedTask);
+      }
+    },
+    changeTaskStatus: (
       state,
       action: PayloadAction<{ id: string; status: TaskType["status"] }>
-    ) {
-      const task = state.tasks.find((task) => task.id === action.payload.id);
+    ) => {
+      const { id, status } = action.payload;
+      const task = state.tasks.find((task) => task.id === id);
       if (task) {
-        task.status = action.payload.status;
+        task.status = status;
       }
     },
   },
 });
 
-export const { addTask, editTask, deleteTask, changeTaskStatus } =
+export const { addTask, editTask, deleteTask, changeTaskStatus, reorderTasks } =
   tasksSlice.actions;
 
 export default tasksSlice.reducer;

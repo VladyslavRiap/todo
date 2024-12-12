@@ -35,6 +35,7 @@ const style = {
   p: 4,
 };
 const basicTags = ["Work", "Private", "Studying", "Shopping"];
+const statusOptions = ["todo", "inProgress", "done"] as const;
 
 const TaskModal: React.FC<TaskModalProps> = ({
   title,
@@ -50,6 +51,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [deadline, setDeadline] = useState<Dayjs | null>(null);
   const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
   const [formats, setFormats] = useState<string[]>([]);
+  const [status, setStatus] = useState<TaskType["status"]>("todo");
 
   useEffect(() => {
     if (taskToEdit) {
@@ -58,6 +60,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       setTags(taskToEdit.tags);
       setDeadline(taskToEdit.deadline ? dayjs(taskToEdit.deadline) : null);
       setPriority(taskToEdit.priority);
+      setStatus(taskToEdit.status);
     }
   }, [taskToEdit]);
 
@@ -69,7 +72,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       tags,
       deadline: deadline ? deadline.format("MM-DD-YYYY") : "",
       priority,
-      status: "todo",
+      status,
     };
     addTaskToList(newTask, taskToEdit);
     if (onClose) onClose();
@@ -160,6 +163,20 @@ const TaskModal: React.FC<TaskModalProps> = ({
               />
             </DemoContainer>
           </LocalizationProvider>
+          <ToggleButtonGroup
+            color="primary"
+            value={status}
+            exclusive
+            onChange={(_, newStatus) => setStatus(newStatus)}
+            fullWidth
+            style={{ marginTop: "16px" }}
+          >
+            {statusOptions.map((option) => (
+              <ToggleButton key={option} value={option}>
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
           <Box display="flex" justifyContent="space-between" mt={2}>
             <Button onClick={onClose} variant="contained" color="secondary">
               Cancel
