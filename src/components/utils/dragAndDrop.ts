@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { arrayMove } from "@dnd-kit/sortable";
-import { TaskType } from "../../features/tasks/tasksSlice";
+import { TaskType, updateTaskOrder } from "../../features/tasks/tasksSlice";
+import { useDispatch } from "react-redux";
+import { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
 export type ColumnType = {
   status: TaskType["status"];
   title: string;
+  isLock: boolean;
 };
 
 export function useDragAndDrop(
@@ -15,18 +18,35 @@ export function useDragAndDrop(
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [tasks, setTasks] = useState<TaskType[]>(tasksFromRedux);
 
-  function onDragStart(event: any) {
+  const dispatch = useDispatch();
+
+  const onClickLock = (status: TaskType["status"]) => {
+    setColumns((prevColumns) =>
+      prevColumns.map((column) =>
+        column.status === status
+          ? { ...column, isLock: !column.isLock }
+          : column
+      )
+    );
+  };
+
+  function onDragStart(event: DragStartEvent) {
     if (event.active.data.current?.type === "column") {
-      setActiveColumn(event.active.data.current.column);
-      return;
+      const column = event.active.data.current?.column;
+      if (column?.isLock) {
+        setActiveColumn(null);
+        return;
+      } else {
+        setActiveColumn(column);
+      }
     }
+
     if (event.active.data.current?.type === "task") {
       setActiveTask(event.active.data.current.task);
-      return;
     }
   }
 
-  function onDragOver(event: any) {
+  function onDragOver(event: DragOverEvent) {
     const { active, over } = event;
     if (!over) return;
 
@@ -34,7 +54,6 @@ export function useDragAndDrop(
     const overId = over.id;
 
     const isActiveATask = active.data.current?.type === "task";
-    const isOverATask = over.data.current?.type === "task";
     const isOverAColumn = over.data.current?.type === "column";
 
     if (isActiveATask && isOverAColumn) {
@@ -48,7 +67,7 @@ export function useDragAndDrop(
 
         return arrayMove(updatedTasks, activeIndex, activeIndex);
       });
-    } else if (isActiveATask && isOverATask) {
+    } else if (isActiveATask && over.data.current?.type === "task") {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const overIndex = tasks.findIndex((t) => t.id === overId);
@@ -64,26 +83,43 @@ export function useDragAndDrop(
     }
   }
 
-  function onDragEnd(event: any) {
+  function onDragEnd(event: DragEndEvent) {
     setActiveColumn(null);
     setActiveTask(null);
+
     const { active, over } = event;
     if (!over) return;
 
-    const activeColumnId = active.id;
-    const overColumnId = over.id;
+    const activeId = active.id;
+    const overId = over.id;
 
-    if (activeColumnId === overColumnId) return;
+    const isActiveATask = active.data.current?.type === "task";
+    const isOverAColumn = over.data.current?.type === "column";
 
-    setColumns((columns) => {
-      const activeColumnIndex = columns.findIndex(
-        (col) => col.status === activeColumnId
-      );
-      const overColumnIndex = columns.findIndex(
-        (col) => col.status === overColumnId
-      );
-      return arrayMove(columns, activeColumnIndex, overColumnIndex);
-    });
+    if (isActiveATask) {
+      const activeIndex = tasks.findIndex((task) => task.id === activeId);
+      const overIndex = tasks.findIndex((task) => task.id === overId);
+
+      if (activeIndex === -1 || overIndex === -1) return;
+
+      const updatedTasks = arrayMove(tasks, activeIndex, overIndex);
+      dispatch(updateTaskOrder(updatedTasks));
+    } else if (isOverAColumn) {
+      const overColumn = columns.find((col) => col.status === overId);
+      if (overColumn?.isLock) {
+        return;
+      }
+
+      setColumns((columns) => {
+        const activeColumnIndex = columns.findIndex(
+          (col) => col.status === activeId
+        );
+        const overColumnIndex = columns.findIndex(
+          (col) => col.status === overId
+        );
+        return arrayMove(columns, activeColumnIndex, overColumnIndex);
+      });
+    }
   }
 
   return {
@@ -95,5 +131,6 @@ export function useDragAndDrop(
     onDragStart,
     onDragOver,
     onDragEnd,
+    onClickLock,
   };
 }

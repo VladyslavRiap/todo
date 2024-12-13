@@ -1,23 +1,31 @@
 import React, { CSSProperties, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Paper, Typography, Box } from "@mui/material";
-import { RootState } from "../store/store";
+
+import { Paper, Typography, Box, Button, Tooltip } from "@mui/material";
+
 import Task from "./Task";
 import { TaskType } from "../features/tasks/tasksSlice";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ColumnType } from "./utils/dragAndDrop";
-
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 interface ColumnProps {
   status: TaskType["status"];
   title: string;
   column: ColumnType;
   tasks: TaskType[];
+  isLock: boolean;
+  onClickLock: (status: TaskType["status"]) => void;
 }
 
-const Column: React.FC<ColumnProps> = ({ status, title, column, tasks }) => {
-  const dispatch = useDispatch();
-
+const Column: React.FC<ColumnProps> = ({
+  status,
+  title,
+  column,
+  tasks,
+  isLock,
+  onClickLock,
+}) => {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
@@ -35,6 +43,7 @@ const Column: React.FC<ColumnProps> = ({ status, title, column, tasks }) => {
       type: "column",
       column,
     },
+    disabled: isLock,
   });
 
   const style: CSSProperties = {
@@ -46,10 +55,9 @@ const Column: React.FC<ColumnProps> = ({ status, title, column, tasks }) => {
     flexGrow: 1,
     backgroundColor: isDragging ? "rgba(255, 255, 255, 0.8)" : "inherit",
     border: isDragging ? "2px solid rgb(243, 58, 106)" : "none",
-    minWidth: "300px",
-    minHeight: isDragging ? "300px" : "none",
+
     height: "100%",
-    cursor: "pointer",
+    cursor: isLock ? "" : "pointer",
   };
 
   if (isDragging) {
@@ -72,8 +80,17 @@ const Column: React.FC<ColumnProps> = ({ status, title, column, tasks }) => {
       style={style}
       elevation={isDragging ? 16 : 1}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography
+        style={{ display: "flex", justifyContent: "space-between" }}
+        variant="h6"
+        gutterBottom
+      >
         {title}
+        <Tooltip title={isLock ? "unlock" : "lock"}>
+          <Button onClick={() => onClickLock(status)}>
+            {isLock ? <LockIcon color="primary" /> : <LockOpenIcon />}{" "}
+          </Button>
+        </Tooltip>
       </Typography>
       <Box
         style={{

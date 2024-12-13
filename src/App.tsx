@@ -20,9 +20,13 @@ import { useEffect } from "react";
 import { useDragAndDrop, ColumnType } from "./components/utils/dragAndDrop";
 
 const columnStatuses: ColumnType[] = [
-  { status: "todo" as TaskType["status"], title: "To Do" },
-  { status: "inProgress" as TaskType["status"], title: "In Progress" },
-  { status: "done" as TaskType["status"], title: "Done" },
+  { status: "todo" as TaskType["status"], title: "To Do", isLock: true },
+  {
+    status: "inProgress" as TaskType["status"],
+    title: "In Progress",
+    isLock: false,
+  },
+  { status: "done" as TaskType["status"], title: "Done", isLock: false },
 ];
 
 const App = () => {
@@ -38,6 +42,7 @@ const App = () => {
     onDragStart,
     onDragOver,
     onDragEnd,
+    onClickLock,
   } = useDragAndDrop(tasksFromRedux, columnStatuses);
 
   const columnsId = useMemo(() => columns.map((col) => col.status), [columns]);
@@ -91,10 +96,12 @@ const App = () => {
                 }}
               >
                 <Column
+                  onClickLock={onClickLock}
                   column={column}
                   status={column.status}
                   title={column.title}
                   tasks={tasks.filter((task) => task.status === column.status)}
+                  isLock={column.isLock}
                 />
               </Box>
             ))}
@@ -102,11 +109,13 @@ const App = () => {
         </Box>
         {createPortal(
           <DragOverlay>
-            {activeColumn && (
+            {activeColumn && !activeColumn.isLock && (
               <Column
+                onClickLock={onClickLock}
                 column={activeColumn}
                 status={activeColumn.status}
                 title={activeColumn.title}
+                isLock={activeColumn.isLock}
                 tasks={tasks.filter(
                   (task) => task.status === activeColumn.status
                 )}
