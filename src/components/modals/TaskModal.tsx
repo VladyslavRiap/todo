@@ -7,15 +7,21 @@ import {
   ToggleButton,
   Button,
   Modal,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Alert,
 } from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { CONFIRM_MODAL_ID, useModal } from "../../contexts/ModalContext";
 import { TaskType } from "../../features/tasks/tasksSlice";
 import { v1 } from "uuid";
 import dayjs, { Dayjs } from "dayjs";
+import { SelectChangeEvent } from "@mui/material";
 
 interface TaskModalProps {
   title?: string;
@@ -23,6 +29,7 @@ interface TaskModalProps {
   taskToEdit?: TaskType | null;
   onClose?: () => void;
 }
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -34,8 +41,10 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const basicTags = ["Work", "Private", "Studying", "Shopping"];
-const statusOptions = ["todo", "inProgress", "done"] as const;
+
+export const basicTags = ["Work", "Private", "Studying", "Shopping"];
+
+export const priorityOptions = ["low", "medium", "high"] as const;
 
 const TaskModal: React.FC<TaskModalProps> = ({
   title,
@@ -44,7 +53,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
   onClose,
 }) => {
   const { closeModal, addTaskToList, openModal } = useModal();
-
   const [taskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -52,6 +60,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
   const [formats, setFormats] = useState<string[]>([]);
   const [status, setStatus] = useState<TaskType["status"]>("todo");
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     if (taskToEdit) {
@@ -65,133 +74,158 @@ const TaskModal: React.FC<TaskModalProps> = ({
   }, [taskToEdit]);
 
   const handleSave = () => {
+    if (taskTitle.trim() === "") {
+      setError("Title is required.");
+      return;
+    }
+
+    if (deadline && deadline.isBefore(dayjs())) {
+      setError("Deadline cannot be in the past.");
+      return;
+    }
+
     const newTask: TaskType = {
       id: taskToEdit ? taskToEdit.id : v1(),
       title: taskTitle,
       description,
       tags,
-      deadline: deadline ? deadline.format("MM-DD-YYYY") : "",
+      deadline: deadline ? deadline.format("YYYY-MM-DD HH:mm") : "",
       priority,
       status,
     };
     addTaskToList(newTask, taskToEdit);
     if (onClose) onClose();
   };
+
   const handleEdit = () => {
+    if (taskTitle.trim() === "") {
+      setError("Title is required.");
+      return;
+    }
+
+    if (deadline && deadline.isBefore(dayjs())) {
+      setError("Deadline cannot be in the past.");
+      return;
+    }
+
     openModal(CONFIRM_MODAL_ID, {
-      message: "are you confirm?",
+      message: "Confrim Changing?",
       onConfirm: handleConfirm,
       onCancel: handleCancelConfirm,
     });
   };
+
   const handleConfirm = () => {
     handleSave();
-
     closeModal(CONFIRM_MODAL_ID);
   };
+
   const handleCancelConfirm = () => {
     closeModal(CONFIRM_MODAL_ID);
   };
-  const handleFormat = (
-    event: React.MouseEvent<HTMLElement>,
-    newFormats: string[]
+
+  const handlePriorityChange = (
+    event: SelectChangeEvent<"low" | "medium" | "high">
   ) => {
-    setFormats(newFormats);
+    setPriority(event.target.value as "low" | "medium" | "high");
   };
 
   return (
-    <>
-      <Modal
-        open
-        onClose={closeModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            {title}
-          </Typography>
-          <TextField
-            onChange={(e) => setTaskTitle(e.target.value)}
-            value={taskTitle}
-            id="taskName"
-            label="Task Name"
-            variant="filled"
-            margin="normal"
-            fullWidth
-          />
-          <TextField
-            onChange={(e) => setDescription(e.target.value)}
-            value={description}
-            id="Description"
-            label="Description"
-            variant="filled"
-            margin="normal"
-            fullWidth
-          />
-          <ToggleButtonGroup
-            color="primary"
-            value={formats}
-            onChange={handleFormat}
-            aria-label="Platform"
-            fullWidth
-          >
-            {basicTags.map((tag) => (
-              <ToggleButton
-                selected={tags.includes(tag)}
-                onClick={() =>
-                  setTags(
-                    tags.includes(tag)
-                      ? tags.filter((t) => t !== tag)
-                      : [...tags, tag]
-                  )
-                }
-                key={tag}
-                value={tag}
-              >
-                {tag}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={["DatePicker"]}>
-              <DatePicker
-                views={["month", "day", "year"]}
-                value={deadline}
-                onChange={(newValue) => setDeadline(newValue)}
-                label="Basic date picker"
-              />
-            </DemoContainer>
-          </LocalizationProvider>
-          <ToggleButtonGroup
-            color="primary"
-            value={status}
-            exclusive
-            onChange={(_, newStatus) => setStatus(newStatus)}
-            fullWidth
-            style={{ marginTop: "16px" }}
-          >
-            {statusOptions.map((option) => (
-              <ToggleButton key={option} value={option}>
-                {option.charAt(0).toUpperCase() + option.slice(1)}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            <Button onClick={onClose} variant="contained" color="secondary">
-              Cancel
-            </Button>
-            <Button
-              onClick={taskToEdit ? handleEdit : handleSave}
-              variant="contained"
-              color="primary"
+    <Modal
+      open
+      onClose={closeModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          {title}
+        </Typography>
+
+        {error && <Alert severity="error">{error}</Alert>}
+
+        <TextField
+          onChange={(e) => setTaskTitle(e.target.value)}
+          value={taskTitle}
+          id="taskName"
+          label="Task Name"
+          variant="filled"
+          margin="normal"
+          fullWidth
+        />
+        <TextField
+          onChange={(e) => setDescription(e.target.value)}
+          value={description}
+          id="Description"
+          label="Description"
+          variant="filled"
+          margin="normal"
+          fullWidth
+        />
+        <ToggleButtonGroup
+          color="primary"
+          value={formats}
+          onChange={(event, newFormats) => setFormats(newFormats)}
+          aria-label="Platform"
+          fullWidth
+        >
+          {basicTags.map((tag) => (
+            <ToggleButton
+              selected={tags.includes(tag)}
+              onClick={() =>
+                setTags(
+                  tags.includes(tag)
+                    ? tags.filter((t) => t !== tag)
+                    : [...tags, tag]
+                )
+              }
+              key={tag}
+              value={tag}
             >
-              {button}
-            </Button>
-          </Box>
+              {tag}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DemoContainer components={["DateTimePicker"]}>
+            <DateTimePicker
+              value={deadline}
+              onChange={(newValue) => setDeadline(newValue)}
+              label="Deadline"
+            />
+          </DemoContainer>
+        </LocalizationProvider>
+
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Priority</InputLabel>
+          <Select
+            value={priority}
+            onChange={handlePriorityChange}
+            label="Priority"
+          >
+            {priorityOptions.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <Box display="flex" justifyContent="space-between" mt={2}>
+          <Button onClick={onClose} variant="contained" color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={taskToEdit ? handleEdit : handleSave}
+            variant="contained"
+            color="primary"
+          >
+            {button}
+          </Button>
         </Box>
-      </Modal>
-    </>
+      </Box>
+    </Modal>
   );
 };
 

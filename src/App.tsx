@@ -2,7 +2,7 @@ import { Box, Button, Container } from "@mui/material";
 import Column from "./components/Column";
 import { TaskType } from "./features/tasks/tasksSlice";
 import { TASK_MODAL_ID, useModal } from "./contexts/ModalContext";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -17,21 +17,20 @@ import Task from "./components/Task";
 import { useSelector } from "react-redux";
 import { RootState } from "./store/store";
 import { useEffect } from "react";
-import { useDragAndDrop, ColumnType } from "./components/utils/dragAndDrop";
-
-const columnStatuses: ColumnType[] = [
-  { status: "todo" as TaskType["status"], title: "To Do", isLock: true },
-  {
-    status: "inProgress" as TaskType["status"],
-    title: "In Progress",
-    isLock: false,
-  },
-  { status: "done" as TaskType["status"], title: "Done", isLock: false },
-];
+import { useDragAndDrop } from "./components/utils/dragAndDrop";
+import FilterMenu from "./components/FilterMenu";
+import { filterTasks } from "./components/utils/filteringTask";
 
 const App = () => {
   const { openModal } = useModal();
-
+  const columnsFromRedux = useSelector(
+    (state: RootState) => state.columns.columns
+  );
+  const [filteredTasks, setFilteredTasks] = useState<TaskType[]>([]);
+  const [filters, setFilters] = useState<{
+    tags?: string[];
+    deadline?: string;
+  }>({});
   const tasksFromRedux = useSelector((state: RootState) => state.tasks.tasks);
   const {
     columns,
@@ -43,7 +42,7 @@ const App = () => {
     onDragOver,
     onDragEnd,
     onClickLock,
-  } = useDragAndDrop(tasksFromRedux, columnStatuses);
+  } = useDragAndDrop(filteredTasks, columnsFromRedux);
 
   const columnsId = useMemo(() => columns.map((col) => col.status), [columns]);
 
@@ -52,12 +51,22 @@ const App = () => {
   );
 
   useEffect(() => {
-    setTasks(tasksFromRedux);
-  }, [tasksFromRedux]);
+    setTasks(filteredTasks);
+  }, [filteredTasks]);
+
+  useEffect(() => {
+    const result = filterTasks(tasksFromRedux, filters);
+    setFilteredTasks(result);
+  }, [filters, tasksFromRedux]);
 
   return (
     <Container>
-      <Box mb={2}>
+      <Box
+        mb={2}
+        display={"flex"}
+        justifyContent={"space-between"}
+        paddingRight={"20px"}
+      >
         <Button
           onClick={() =>
             openModal(TASK_MODAL_ID, {
@@ -69,6 +78,7 @@ const App = () => {
         >
           Add New Task
         </Button>
+        <FilterMenu setFilters={setFilters} />
       </Box>
       <DndContext
         sensors={sensors}

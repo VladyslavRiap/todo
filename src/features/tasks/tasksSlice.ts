@@ -14,17 +14,19 @@ export interface TaskType {
 export interface taskState {
   tasks: TaskType[];
 }
+
 const initialState: taskState = {
   tasks: [],
 };
 
 const tasksSlice = createSlice({
-  name: "task",
+  name: "tasks",
   initialState,
   reducers: {
     addTask(state, action: PayloadAction<Omit<TaskType, "id">>) {
       state.tasks.push({ ...action.payload, id: v1() });
     },
+
     editTask(state, action: PayloadAction<TaskType>) {
       const index = state.tasks.findIndex(
         (task) => task.id === action.payload.id
@@ -33,9 +35,11 @@ const tasksSlice = createSlice({
         state.tasks[index] = action.payload;
       }
     },
+
     deleteTask(state, action: PayloadAction<string>) {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload);
     },
+
     updateTaskOrder(state, action: PayloadAction<TaskType[]>) {
       state.tasks = action.payload;
     },

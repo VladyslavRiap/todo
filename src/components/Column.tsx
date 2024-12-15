@@ -1,14 +1,13 @@
 import React, { CSSProperties, useMemo } from "react";
-
 import { Paper, Typography, Box, Button, Tooltip } from "@mui/material";
-
 import Task from "./Task";
 import { TaskType } from "../features/tasks/tasksSlice";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ColumnType } from "./utils/dragAndDrop";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { ColumnType } from "../features/columns/columnsSlice";
+
 interface ColumnProps {
   status: TaskType["status"];
   title: string;
@@ -26,9 +25,7 @@ const Column: React.FC<ColumnProps> = ({
   isLock,
   onClickLock,
 }) => {
-  const tasksIds = useMemo(() => {
-    return tasks.map((task) => task.id);
-  }, [tasks]);
+  const tasksIds = useMemo(() => tasks.map((task) => task.id), [tasks]);
 
   const {
     setNodeRef,
@@ -46,28 +43,35 @@ const Column: React.FC<ColumnProps> = ({
     disabled: isLock,
   });
 
-  const style: CSSProperties = {
+  const columnStyle: CSSProperties = {
     transition,
     transform: CSS.Transform.toString(transform),
-    zIndex: 30,
+    zIndex: isDragging ? 30 : "auto",
+    backgroundColor: isDragging ? "rgba(255, 255, 255, 0.9)" : "#f7f9fc",
+    border: isDragging ? "2px solid rgb(243, 58, 106)" : "1px solid #e0e0e0",
+    borderRadius: "8px",
+    boxShadow: isDragging ? "0px 4px 15px rgba(0, 0, 0, 0.2)" : "none",
+    width: "350px",
     display: "flex",
     flexDirection: "column",
-    flexGrow: 1,
-    backgroundColor: isDragging ? "rgba(255, 255, 255, 0.8)" : "inherit",
-    border: isDragging ? "2px solid rgb(243, 58, 106)" : "none",
-
     height: "100%",
-    cursor: isLock ? "" : "pointer",
+  };
+
+  const contentStyle: CSSProperties = {
+    overflowY: "auto",
+    maxHeight: "calc(100vh - 160px)",
+    padding: "8px",
+    boxSizing: "border-box",
   };
 
   if (isDragging) {
     return (
       <Paper
-        variant="outlined"
         ref={setNodeRef}
         {...attributes}
         {...listeners}
-        style={style}
+        style={columnStyle}
+        elevation={isDragging ? 8 : 2}
       />
     );
   }
@@ -77,30 +81,34 @@ const Column: React.FC<ColumnProps> = ({
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      style={style}
-      elevation={isDragging ? 16 : 1}
+      style={columnStyle}
+      elevation={isDragging ? 8 : 2}
     >
-      <Typography
-        style={{ display: "flex", justifyContent: "space-between" }}
-        variant="h6"
-        gutterBottom
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        padding="8px"
+        borderBottom="1px solid #ddd"
+        bgcolor="#ffffff"
+        borderRadius="8px 8px 0 0"
       >
-        {title}
-        <Tooltip title={isLock ? "unlock" : "lock"}>
-          <Button onClick={() => onClickLock(status)}>
-            {isLock ? <LockIcon color="primary" /> : <LockOpenIcon />}{" "}
+        <Typography variant="h6" component="div" noWrap>
+          {title}
+        </Typography>
+        <Tooltip title={isLock ? "Unlock column" : "Lock column"}>
+          <Button
+            onClick={() => onClickLock(status)}
+            size="small"
+            style={{ minWidth: "auto", padding: "4px" }}
+          >
+            {isLock ? <LockIcon color="primary" /> : <LockOpenIcon />}
           </Button>
         </Tooltip>
-      </Typography>
-      <Box
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-          height: "100%",
-          overflowY: "auto",
-        }}
-      >
+      </Box>
+
+      {/* Содержимое колонки */}
+      <Box style={contentStyle}>
         <SortableContext items={tasksIds}>
           {tasks.map((task) => (
             <Task key={task.id} task={task} />

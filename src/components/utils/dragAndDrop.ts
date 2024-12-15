@@ -3,17 +3,17 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { TaskType, updateTaskOrder } from "../../features/tasks/tasksSlice";
 import { useDispatch } from "react-redux";
 import { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
-export type ColumnType = {
-  status: TaskType["status"];
-  title: string;
-  isLock: boolean;
-};
+import {
+  ColumnType,
+  setColumns,
+  toggleLock,
+} from "../../features/columns/columnsSlice";
 
 export function useDragAndDrop(
   tasksFromRedux: TaskType[],
   columnStatuses: ColumnType[]
 ) {
-  const [columns, setColumns] = useState<ColumnType[]>(columnStatuses);
+  const [columns, setColumnsState] = useState<ColumnType[]>(columnStatuses);
   const [activeColumn, setActiveColumn] = useState<ColumnType | null>(null);
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [tasks, setTasks] = useState<TaskType[]>(tasksFromRedux);
@@ -21,12 +21,15 @@ export function useDragAndDrop(
   const dispatch = useDispatch();
 
   const onClickLock = (status: TaskType["status"]) => {
-    setColumns((prevColumns) =>
-      prevColumns.map((column) =>
-        column.status === status
-          ? { ...column, isLock: !column.isLock }
-          : column
-      )
+    dispatch(toggleLock(status));
+    setColumnsState(
+      columns.map((column) => {
+        if (column.status === status) {
+          return { ...column, isLock: !column.isLock };
+        } else {
+          return column;
+        }
+      })
     );
   };
 
@@ -110,14 +113,20 @@ export function useDragAndDrop(
         return;
       }
 
-      setColumns((columns) => {
+      setColumnsState((columns) => {
         const activeColumnIndex = columns.findIndex(
           (col) => col.status === activeId
         );
         const overColumnIndex = columns.findIndex(
           (col) => col.status === overId
         );
-        return arrayMove(columns, activeColumnIndex, overColumnIndex);
+        const newColumns = arrayMove(
+          columns,
+          activeColumnIndex,
+          overColumnIndex
+        );
+        dispatch(setColumns(newColumns));
+        return newColumns;
       });
     }
   }
