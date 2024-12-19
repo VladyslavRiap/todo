@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo } from "react";
+import React, { CSSProperties, useEffect, useMemo, useState } from "react";
 import { Paper, Typography, Box, Button, Tooltip } from "@mui/material";
 import Task from "./Task";
 import { TaskType } from "../features/tasks/tasksSlice";
@@ -7,6 +7,9 @@ import { CSS } from "@dnd-kit/utilities";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { ColumnType } from "../features/columns/columnsSlice";
+import SortMenu from "./SortMenu";
+import sortTasks from "./utils/sorteringTask";
+import { useTranslation } from "react-i18next";
 
 interface ColumnProps {
   status: TaskType["status"];
@@ -25,7 +28,17 @@ const Column: React.FC<ColumnProps> = ({
   isLock,
   onClickLock,
 }) => {
+  const { t } = useTranslation();
   const tasksIds = useMemo(() => tasks.map((task) => task.id), [tasks]);
+  const [sortedTasks, setSortedTasks] = useState<TaskType[]>(tasks);
+
+  useEffect(() => {
+    setSortedTasks(tasks);
+  }, [tasks]);
+
+  const handleSort = (order: "lowToHigh" | "highToLow" | "reset") => {
+    setSortedTasks(sortTasks(tasks, order));
+  };
 
   const {
     setNodeRef,
@@ -72,7 +85,7 @@ const Column: React.FC<ColumnProps> = ({
         {...listeners}
         style={columnStyle}
         elevation={isDragging ? 8 : 2}
-      />
+      ></Paper>
     );
   }
 
@@ -96,7 +109,8 @@ const Column: React.FC<ColumnProps> = ({
         <Typography variant="h6" component="div" noWrap>
           {title}
         </Typography>
-        <Tooltip title={isLock ? "Unlock column" : "Lock column"}>
+        <SortMenu onSort={handleSort} />
+        <Tooltip title={isLock ? t("unlockColumn") : t("lockColumn")}>
           <Button
             onClick={() => onClickLock(status)}
             size="small"
@@ -107,10 +121,9 @@ const Column: React.FC<ColumnProps> = ({
         </Tooltip>
       </Box>
 
-      {/* Содержимое колонки */}
       <Box style={contentStyle}>
         <SortableContext items={tasksIds}>
-          {tasks.map((task) => (
+          {sortedTasks.map((task) => (
             <Task key={task.id} task={task} />
           ))}
         </SortableContext>

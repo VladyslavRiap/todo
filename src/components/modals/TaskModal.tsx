@@ -22,6 +22,7 @@ import { TaskType } from "../../features/tasks/tasksSlice";
 import { v1 } from "uuid";
 import dayjs, { Dayjs } from "dayjs";
 import { SelectChangeEvent } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface TaskModalProps {
   title?: string;
@@ -61,6 +62,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [formats, setFormats] = useState<string[]>([]);
   const [status, setStatus] = useState<TaskType["status"]>("todo");
   const [error, setError] = useState<string>("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (taskToEdit) {
@@ -75,12 +77,12 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   const handleSave = () => {
     if (taskTitle.trim() === "") {
-      setError("Title is required.");
+      setError(t("error.titleRequired"));
       return;
     }
 
     if (deadline && deadline.isBefore(dayjs())) {
-      setError("Deadline cannot be in the past.");
+      setError(t("error.deadlinePast"));
       return;
     }
 
@@ -99,17 +101,17 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
   const handleEdit = () => {
     if (taskTitle.trim() === "") {
-      setError("Title is required.");
+      setError(t("error.titleRequired"));
       return;
     }
 
     if (deadline && deadline.isBefore(dayjs())) {
-      setError("Deadline cannot be in the past.");
+      setError(t("error.deadlinePast"));
       return;
     }
 
     openModal(CONFIRM_MODAL_ID, {
-      message: "Confrim Changing?",
+      message: t("confirm.message"),
       onConfirm: handleConfirm,
       onCancel: handleCancelConfirm,
     });
@@ -148,7 +150,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           onChange={(e) => setTaskTitle(e.target.value)}
           value={taskTitle}
           id="taskName"
-          label="Task Name"
+          label={t("taskName")}
           variant="filled"
           margin="normal"
           fullWidth
@@ -157,7 +159,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           onChange={(e) => setDescription(e.target.value)}
           value={description}
           id="Description"
-          label="Description"
+          label={t("description")}
           variant="filled"
           margin="normal"
           fullWidth
@@ -166,7 +168,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
           color="primary"
           value={formats}
           onChange={(event, newFormats) => setFormats(newFormats)}
-          aria-label="Platform"
+          aria-label="Tags"
           fullWidth
         >
           {basicTags.map((tag) => (
@@ -182,7 +184,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
               key={tag}
               value={tag}
             >
-              {tag}
+              {t(`tags.${tag}`)}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
@@ -192,21 +194,21 @@ const TaskModal: React.FC<TaskModalProps> = ({
             <DateTimePicker
               value={deadline}
               onChange={(newValue) => setDeadline(newValue)}
-              label="Deadline"
+              label={t("deadline")}
             />
           </DemoContainer>
         </LocalizationProvider>
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>Priority</InputLabel>
+          <InputLabel>{t("priority")}</InputLabel>
           <Select
             value={priority}
             onChange={handlePriorityChange}
-            label="Priority"
+            label={t("priority")}
           >
             {priorityOptions.map((option) => (
               <MenuItem key={option} value={option}>
-                {option.charAt(0).toUpperCase() + option.slice(1)}
+                {t(`priorityOptions.${option}`)}
               </MenuItem>
             ))}
           </Select>
@@ -214,7 +216,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
         <Box display="flex" justifyContent="space-between" mt={2}>
           <Button onClick={onClose} variant="contained" color="secondary">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={taskToEdit ? handleEdit : handleSave}

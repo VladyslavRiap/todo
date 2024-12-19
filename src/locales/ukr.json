@@ -1,0 +1,70 @@
+{
+  "addTask": "Додати завдання",
+  "newTask": "Нове завдання",
+  "buttonAdd": "Додати завдання",
+  "filters": "Фільтри",
+  "taskName": "Назва завдання",
+  "description": "Опис",
+  "priority": "Пріоритет",
+  "cancel": "Скасувати",
+  "error": {
+    "titleRequired": "Назва обов'язкова.",
+    "deadlinePast": "Дедлайн не може бути в минулому."
+  },
+  "confirm": {
+    "message": "Підтвердити зміни?",
+    "confirm": "Підтвердити"
+  },
+  "tags": {
+    "Work": "Робота",
+    "Private": "Особисте",
+    "Studying": "Навчання",
+    "Shopping": "Покупки"
+  },
+  "priorityOptions": {
+    "low": "Низький",
+    "medium": "Середній",
+    "high": "Високий"
+  },
+  "columns": {
+    "todo": "До виконання",
+    "inProgress": "У процесі",
+    "done": "Виконано"
+  },
+  "lockColumn": "Заблокувати колонку",
+  "unlockColumn": "Розблокувати колонку",
+  "sortBy": "Сортувати за",
+  "editTask": "Редагувати завдання",
+  "edit": "Редагувати",
+  "history": "Історія",
+  "delete": "Видалити",
+  "deadline": "Кінцевий термін",
+  "Work": "Робота",
+  "Private": "Особисте",
+  "Studying": "Навчання",
+  "Shopping": "Покупки",
+  "sort": "Сортувати",
+  "sortLowToHigh": "Сортувати від низького до високого",
+  "sortHighToLow": "Сортувати від високого до низького",
+  "reset": "Скинути",
+  "filterByTags": "Фільтрувати за тегами",
+  "filterByDeadline": "Фільтрувати за кінцевим терміном",
+  "filterByPriority": "Фільтрувати за пріоритетом",
+  "apply": "Застосувати",
+  "deadlines": {
+    "1_day": "1 день",
+    "7_days": "7 днів",
+    "monthly": "Щомісяця"
+  },
+  "created": "Створено",
+  "noHistory": "Історія відсутня",
+  "close": "Закрити",
+  "changeTitle": "Заголовок",
+  "changeDescription": "Опис",
+  "title": "Заголовок",
+  "status": "Статус",
+  "change": "Зміна",
+  "titleChange": "Назва",
+  "tagsChange": "Теги",
+  "priorityChange": "Пріоритет"
+}

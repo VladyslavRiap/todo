@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, Button, Modal } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmModalProps {
   message?: string;
@@ -26,6 +27,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   return (
     <Modal
       open
@@ -39,10 +41,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         </Typography>
         <Box display="flex" justifyContent="space-between" mt={2}>
           <Button onClick={onCancel} variant="contained" color="secondary">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={onConfirm} variant="contained" color="primary">
-            Confirm
+            {t("confirm.confirm")}
           </Button>
         </Box>
       </Box>

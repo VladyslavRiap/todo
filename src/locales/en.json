@@ -1,0 +1,76 @@
+{
+  "addTask": "Add New Task",
+  "newTask": "New Task",
+  "buttonAdd": "Add Task",
+  "filters": "Filters",
+
+  "taskName": "Task Name",
+  "description": "Description",
+  "deadline": "Deadline",
+  "priority": "Priority",
+  "cancel": "Cancel",
+  "error": {
+    "titleRequired": "Title is required.",
+    "deadlinePast": "Deadline cannot be in the past."
+  },
+  "confirm": {
+    "message": "Confirm changes?",
+    "confirm": "Confirm "
+  },
+  "columns": {
+    "todo": "To Do",
+    "inProgress": "In Progress",
+    "done": "Done"
+  },
+  "lockColumn": "Lock column",
+  "unlockColumn": "Unlock column",
+  "sortBy": "Sort by",
+  "editTask": "Edit Task",
+  "edit": "Edit",
+
+  "delete": "Delete",
+  "Work": "Work",
+  "Private": "Private",
+  "Studying": "Studying",
+  "Shopping": "Shopping",
+  "sort": "Sort",
+  "sortLowToHigh": "Sort from Low to High",
+  "sortHighToLow": "Sort from High to Low",
+  "reset": "Reset",
+  "filterByTags": "Filter by tags",
+  "filterByDeadline": "Filter by deadline",
+  "filterByPriority": "Filter by priority",
+  "apply": "Apply",
+  "deadlines": {
+    "1_day": "1 day",
+    "7_days": "7 days",
+    "monthly": "Monthly"
+  },
+
+  "close": "Close",
+  "title": "Title",
+
+  "status": "Status",
+  "changeKeys": {
+    "title": "Title: '{{oldValue}}' → '{{newValue}}'",
+    "description": "Description: '{{oldValue}}' → '{{newValue}}'",
+    "tags": "Tags: '{{oldValue}}' → '{{newValue}}'",
+    "deadline": "Deadline: '{{oldValue}}' → '{{newValue}}'",
+    "priority": "Priority: '{{oldValue}}' → '{{newValue}}'",
+    "status": "Status: '{{oldValue}}' → '{{newValue}}'"
+  },
+  "history": "History",
+  "created": "Created",
+  "noHistory": "No history",
+  "change": "Change",
+  "titleChange": "Title",
+  "tagsChange": "Tags",
+  "priorityChange": "Priority",
+  "tags": {
+    "Work": "Work",
+    "Private": "Private",
+    "Studying": "Studying",
+    "Shopping": "Shopping"
+  },
+  "priorityOptions": { "low": "Low", "medium": "Medium", "high": "High" }
+}

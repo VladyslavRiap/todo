@@ -20,8 +20,11 @@ import { useEffect } from "react";
 import { useDragAndDrop } from "./components/utils/dragAndDrop";
 import FilterMenu from "./components/FilterMenu";
 import { filterTasks } from "./components/utils/filteringTask";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 const App = () => {
+  const { t } = useTranslation();
   const { openModal } = useModal();
   const columnsFromRedux = useSelector(
     (state: RootState) => state.columns.columns
@@ -70,15 +73,18 @@ const App = () => {
         <Button
           onClick={() =>
             openModal(TASK_MODAL_ID, {
-              title: "New Task",
-              button: "Add Task",
+              title: t("newTask"),
+              button: t("buttonAdd"),
             })
           }
           variant="contained"
         >
-          Add New Task
+          {t("addTask")}
         </Button>
-        <FilterMenu setFilters={setFilters} />
+        <Box display={"flex"}>
+          <FilterMenu setFilters={setFilters} />
+          <LanguageSwitcher />
+        </Box>
       </Box>
       <DndContext
         sensors={sensors}
@@ -109,7 +115,7 @@ const App = () => {
                   onClickLock={onClickLock}
                   column={column}
                   status={column.status}
-                  title={column.title}
+                  title={t(`columns.${column.status}`)}
                   tasks={tasks.filter((task) => task.status === column.status)}
                   isLock={column.isLock}
                 />
@@ -124,7 +130,7 @@ const App = () => {
                 onClickLock={onClickLock}
                 column={activeColumn}
                 status={activeColumn.status}
-                title={activeColumn.title}
+                title={t(`columns.${activeColumn.status}`)}
                 isLock={activeColumn.isLock}
                 tasks={tasks.filter(
                   (task) => task.status === activeColumn.status

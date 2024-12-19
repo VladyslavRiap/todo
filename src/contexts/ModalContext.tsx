@@ -3,12 +3,14 @@ import { useDispatch } from "react-redux";
 import { addTask, editTask, TaskType } from "../features/tasks/tasksSlice";
 import TaskModal from "../components/modals/TaskModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
+import HistoryModal from "../components/modals/HistoryModal";
 export const TASK_MODAL_ID = "taskModal";
 export const CONFIRM_MODAL_ID = "confirmModal";
-
+export const HISTORY_MODAL_ID = "historyModal";
 export const modalsLookUp: { [key: string]: React.FC<any> } = {
   [TASK_MODAL_ID]: TaskModal,
   [CONFIRM_MODAL_ID]: ConfirmModal,
+  [HISTORY_MODAL_ID]: HistoryModal,
 };
 interface ModalContextValue {
   modal: { name: string; options: Record<string, any> }[];

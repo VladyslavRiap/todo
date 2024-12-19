@@ -10,9 +10,14 @@ import {
   Box,
 } from "@mui/material";
 import { deleteTask, TaskType } from "../features/tasks/tasksSlice";
-import { TASK_MODAL_ID, useModal } from "../contexts/ModalContext";
+import {
+  HISTORY_MODAL_ID,
+  TASK_MODAL_ID,
+  useModal,
+} from "../contexts/ModalContext";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useTranslation } from "react-i18next";
 
 export interface TaskProps {
   task: TaskType;
@@ -22,6 +27,7 @@ export interface TaskProps {
 const Task: React.FC<TaskProps> = ({ task }) => {
   const { openModal } = useModal();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const handleDelete = () => {
     dispatch(deleteTask(task.id));
@@ -29,9 +35,15 @@ const Task: React.FC<TaskProps> = ({ task }) => {
 
   const handleEdit = () => {
     openModal(TASK_MODAL_ID, {
-      title: "Edit Task",
-      button: "Edit",
+      title: t("editTask"),
+      button: t("edit"),
       taskToEdit: task,
+    });
+  };
+
+  const handleHistory = () => {
+    openModal(HISTORY_MODAL_ID, {
+      taskToHistory: task,
     });
   };
 
@@ -106,9 +118,19 @@ const Task: React.FC<TaskProps> = ({ task }) => {
         }}
       />
       <CardContent>
-        <Typography variant="h6" component="div" gutterBottom>
-          {task.title}
-        </Typography>
+        <Box display={"flex"} justifyContent={"space-between"}>
+          <Typography variant="h6" component="div" gutterBottom>
+            {task.title}
+          </Typography>
+          <Button
+            onClick={handleHistory}
+            size="small"
+            color="success"
+            variant="outlined"
+          >
+            {t("history")}
+          </Button>
+        </Box>
 
         <Typography
           variant="body2"
@@ -122,20 +144,16 @@ const Task: React.FC<TaskProps> = ({ task }) => {
           {task.description}
         </Typography>
 
-        <Typography variant="body2" color="textPrimary">
-          <strong>Priority:</strong> {task.priority}
-        </Typography>
-
         {task.deadline && (
           <Typography variant="body2" color="textSecondary">
-            <strong>Deadline:</strong> {task.deadline}
+            <strong>{t("deadline")}:</strong> {task.deadline}
           </Typography>
         )}
 
         {task.tags.length > 0 && (
           <Box mt={1} display="flex" flexWrap="wrap" gap="8px">
             {task.tags.map((tag) => (
-              <Chip key={tag} label={tag} variant="outlined" />
+              <Chip key={tag} label={t(tag)} variant="outlined" />
             ))}
           </Box>
         )}
@@ -148,7 +166,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
           onClick={handleDelete}
           variant="contained"
         >
-          Delete
+          {t("delete")}
         </Button>
         <Button
           size="small"
@@ -156,7 +174,7 @@ const Task: React.FC<TaskProps> = ({ task }) => {
           onClick={handleEdit}
           variant="outlined"
         >
-          Edit
+          {t("edit")}
         </Button>
       </CardActions>
     </Card>

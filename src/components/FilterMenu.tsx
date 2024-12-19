@@ -11,9 +11,9 @@ import {
   Radio,
   Box,
 } from "@mui/material";
-import { basicTags, priorityOptions } from "./modals/TaskModal";
+import { useTranslation } from "react-i18next";
 
-const tags = basicTags;
+const tags = ["Work", "Private", "Studying", "Shopping"];
 const deadlines = ["1 day", "7 days", "monthly"];
 
 interface FilterMenuProps {
@@ -29,6 +29,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDeadline, setSelectedDeadline] = useState<string>("");
   const [selectedPriority, setSelectedPriority] = useState<string>("");
+  const { t } = useTranslation();
 
   const handleOpen = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -78,7 +79,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
         onMouseEnter={handleOpen}
         onClick={handleOpen}
       >
-        Filters
+        {t("filters")}
       </Button>
       <Menu
         style={{ display: "flex", flexDirection: "row" }}
@@ -100,7 +101,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
         <Box display="flex" flexDirection="row" padding={2}>
           <Box flex={1} paddingBottom={2}>
             <MenuItem disabled>
-              <ListItemText primary="Filter by tags" />
+              <ListItemText primary={t("filterByTags")} />{" "}
             </MenuItem>
             <FormGroup>
               {tags.map((tag) => (
@@ -113,7 +114,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
                       value={tag}
                     />
                   }
-                  label={tag}
+                  label={t(`tags.${tag}`)}
                 />
               ))}
             </FormGroup>
@@ -121,7 +122,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
 
           <Box flex={1} paddingBottom={2}>
             <MenuItem disabled>
-              <ListItemText primary="Filter by deadline" />
+              <ListItemText primary={t("filterByDeadline")} />{" "}
             </MenuItem>
             <RadioGroup
               value={selectedDeadline}
@@ -132,7 +133,9 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
                   key={deadline}
                   value={deadline}
                   control={<Radio />}
-                  label={deadline}
+                  label={t(
+                    `deadlines.${deadline.replace(" ", "_").toLowerCase()}`
+                  )}
                 />
               ))}
             </RadioGroup>
@@ -140,18 +143,18 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
 
           <Box flex={1} paddingBottom={2}>
             <MenuItem disabled>
-              <ListItemText primary="Filter by priority" />
+              <ListItemText primary={t("filterByPriority")} />{" "}
             </MenuItem>
             <RadioGroup
               value={selectedPriority}
               onChange={handlePriorityChange}
             >
-              {priorityOptions.map((priority) => (
+              {["low", "medium", "high"].map((priority) => (
                 <FormControlLabel
                   key={priority}
                   value={priority}
                   control={<Radio />}
-                  label={priority}
+                  label={t(`priorityOptions.${priority}`)}
                 />
               ))}
             </RadioGroup>
@@ -160,10 +163,10 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
 
         <Box display="flex" justifyContent="space-between" padding={2}>
           <Button onClick={resetFilters} variant="outlined" color="secondary">
-            Reset
+            {t("reset")}
           </Button>
           <Button onClick={applyFilters} variant="contained" color="primary">
-            Apply
+            {t("apply")}
           </Button>
         </Box>
       </Menu>
