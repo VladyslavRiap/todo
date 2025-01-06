@@ -3,29 +3,19 @@
   "newTask": "Новая задача",
   "buttonAdd": "Добавить задачу",
   "filters": "Фильтры",
+
   "taskName": "Название задачи",
   "description": "Описание",
-
+  "deadline": "Срок выполнения",
   "priority": "Приоритет",
   "cancel": "Отмена",
   "error": {
     "titleRequired": "Название обязательно.",
-    "deadlinePast": "Дедлайн не может быть в прошлом."
+    "deadlinePast": "Срок выполнения не может быть в прошлом."
   },
   "confirm": {
     "message": "Подтвердить изменения?",
-    "confirm": "Подтвердить "
-  },
-  "tags": {
-    "Work": "Работа",
-    "Private": "Личное",
-    "Studying": "Учёба",
-    "Shopping": "Покупки"
-  },
-  "priorityOptions": {
-    "low": "Низкий",
-    "medium": "Средний",
-    "high": "Высокий"
+    "confirm": "Подтвердить"
   },
   "columns": {
     "todo": "К выполнению",
@@ -37,18 +27,17 @@
   "sortBy": "Сортировать по",
   "editTask": "Редактировать задачу",
   "edit": "Редактировать",
-  "history": "История",
+
   "delete": "Удалить",
-  "deadline": "Срок выполнения",
   "Work": "Работа",
   "Private": "Личное",
   "Studying": "Учёба",
   "Shopping": "Покупки",
-  "sort": "Сортировать",
+  "sort": "Сортировка",
   "sortLowToHigh": "Сортировать от низкого к высокому",
   "sortHighToLow": "Сортировать от высокого к низкому",
   "reset": "Сбросить",
-  "filterByTags": "Фильтровать по тэгам",
+  "filterByTags": "Фильтровать по меткам",
   "filterByDeadline": "Фильтровать по сроку",
   "filterByPriority": "Фильтровать по приоритету",
   "apply": "Применить",
@@ -58,18 +47,45 @@
     "monthly": "Ежемесячно"
   },
 
-  "created": "Создано",
-  "noHistory": "История отсутствует",
   "close": "Закрыть",
-  "changeTitle": "Заголовок",
-  "changeDescription": "Описание",
-
-  "title": "Заголовок",
+  "title": "Название",
 
   "status": "Статус",
-
+  "changeKeys": {
+    "title": "Название: '{{oldValue}}' → '{{newValue}}'",
+    "description": "Описание: '{{oldValue}}' → '{{newValue}}'",
+    "tags": "Метки: '{{oldValue}}' → '{{newValue}}'",
+    "deadline": "Срок выполнения: '{{oldValue}}' → '{{newValue}}'",
+    "priority": "Приоритет: '{{oldValue}}' → '{{newValue}}'",
+    "status": "Статус: '{{oldValue}}' → '{{newValue}}'"
+  },
+  "history": "История",
+  "created": "Создано",
+  "noHistory": "История отсутствует",
   "change": "Изменение",
   "titleChange": "Название",
-  "tagsChange": "Теги",
-  "priorityChange": "Приоритет"
+  "tagsChange": "Метки",
+  "priorityChange": "Приоритет",
+  "tags": {
+    "Work": "Работа",
+    "Private": "Личное",
+    "Studying": "Учёба",
+    "Shopping": "Покупки"
+  },
+  "priorityOptions": {
+    "low": "Низкий",
+    "medium": "Средний",
+    "high": "Высокий"
+  },
+  "dark": "тёмная",
+  "light": "светлая",
+
+  "task": "Задача",
+  "deadlineNotification": "Задача \"{{title}}\" просрочена на {{minutes}} минут!",
+  "deferredTask": "Отложенная задача",
+  "deferredTasks": "Отложенные задачи",
+  "expiredTask": "Просроченные задачи",
+  "deferredDate": "Задача будет добавлена",
+  "Restoretask": "Восстановить",
+  "Delete": "Удалить"
 }

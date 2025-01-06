@@ -1,28 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  TextField,
-  Typography,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton,
-  Button,
-  Modal,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Alert,
-} from "@mui/material";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { CONFIRM_MODAL_ID, useModal } from "../../contexts/ModalContext";
-import { TaskType } from "../../features/tasks/tasksSlice";
-import { v1 } from "uuid";
+import styled from "styled-components";
 import dayjs, { Dayjs } from "dayjs";
-import { SelectChangeEvent } from "@mui/material";
+import { v1 } from "uuid";
 import { useTranslation } from "react-i18next";
+import { TaskType } from "../../features/tasks/tasksSlice";
+import { CONFIRM_MODAL_ID, useModal } from "../../contexts/ModalContext";
+import { useThemeContext } from "../../contexts/ThemesContext";
+import { useSnackbarContext } from "../../contexts/SnackBarContext";
+import { Button, Overlay } from "../utils/commonStyles";
 
 interface TaskModalProps {
   title?: string;
@@ -31,21 +16,164 @@ interface TaskModalProps {
   onClose?: () => void;
 }
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
 export const basicTags = ["Work", "Private", "Studying", "Shopping"];
-
 export const priorityOptions = ["low", "medium", "high"] as const;
+
+const ModalContent = styled.div<{ theme: string }>`
+  background: ${({ theme }) => (theme === "dark" ? "#333" : "#fff")};
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+  width: 450px;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.3s ease-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media (max-width: 768px) {
+    width: 90%;
+    padding: 16px;
+  }
+`;
+
+const Title = styled.h2<{ theme: string }>`
+  font-size: 20px;
+  margin: 0 0 16px;
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+`;
+
+const Input = styled.input<{ theme: string }>`
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid ${({ theme }) => (theme === "dark" ? "#555" : "#ccc")};
+  background: ${({ theme }) => (theme === "dark" ? "#444" : "#fff")};
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+  border-radius: 8px;
+  width: 95%;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
+
+const TextArea = styled.textarea<{ theme: string }>`
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid ${({ theme }) => (theme === "dark" ? "#555" : "#ccc")};
+  background: ${({ theme }) => (theme === "dark" ? "#444" : "#fff")};
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+  border-radius: 8px;
+  width: 95%;
+  resize: none;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
+
+const TagButton = styled.button<{ selected: boolean; theme: string }>`
+  padding: 8px 16px;
+  border: 1px solid
+    ${({ selected, theme }) =>
+      selected ? "#007bff" : theme === "dark" ? "#555" : "#ccc"};
+  background-color: ${({ selected, theme }) =>
+    selected ? "#007bff" : theme === "dark" ? "#444" : "transparent"};
+  color: ${({ selected, theme }) =>
+    selected ? "#fff" : theme === "dark" ? "#fff" : "#000"};
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ selected, theme }) =>
+      selected
+        ? "#0056b3"
+        : theme === "dark"
+        ? "#555"
+        : "rgba(0, 123, 255, 0.1)"};
+  }
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
+
+const TagGroup = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 2px;
+  }
+`;
+
+const Select = styled.select<{ theme: string }>`
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid ${({ theme }) => (theme === "dark" ? "#555" : "#ccc")};
+  background: ${({ theme }) => (theme === "dark" ? "#444" : "#fff")};
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+  border-radius: 8px;
+  width: 101%;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    width: 103%;
+  }
+`;
+
+const DateTimeInput = styled.input<{ theme: string }>`
+  padding: 12px;
+  font-size: 14px;
+  border: 1px solid ${({ theme }) => (theme === "dark" ? "#555" : "#ccc")};
+  background: ${({ theme }) => (theme === "dark" ? "#444" : "#fff")};
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+  border-radius: 8px;
+  width: 95%;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: space-between;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 8px;
+
+    button {
+      width: 100%;
+    }
+  }
+`;
+
+const DateTimeContainer = styled.div`
+  padding-top: 12px;
+`;
+
+const ErrorMessage = styled.div`
+  color: #f44336;
+  font-size: 14px;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
 
 const TaskModal: React.FC<TaskModalProps> = ({
   title,
@@ -59,11 +187,14 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [tags, setTags] = useState<string[]>([]);
   const [deadline, setDeadline] = useState<Dayjs | null>(null);
   const [priority, setPriority] = useState<"high" | "medium" | "low">("medium");
-  const [formats, setFormats] = useState<string[]>([]);
   const [status, setStatus] = useState<TaskType["status"]>("todo");
   const [error, setError] = useState<string>("");
-  const { t } = useTranslation();
+  const [deferredDate, setDeferredDate] = useState<Dayjs | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const { t } = useTranslation();
+  const { theme } = useThemeContext();
+  const { showMessage } = useSnackbarContext();
   useEffect(() => {
     if (taskToEdit) {
       setTaskTitle(taskToEdit.title);
@@ -72,6 +203,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
       setDeadline(taskToEdit.deadline ? dayjs(taskToEdit.deadline) : null);
       setPriority(taskToEdit.priority);
       setStatus(taskToEdit.status);
+      setDeferredDate(null);
     }
   }, [taskToEdit]);
 
@@ -85,7 +217,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
       setError(t("error.deadlinePast"));
       return;
     }
-
+    if (deferredDate && deferredDate.isBefore(dayjs())) {
+      setError("deferredPast");
+      return;
+    }
     const newTask: TaskType = {
       id: taskToEdit ? taskToEdit.id : v1(),
       title: taskTitle,
@@ -94,8 +229,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
       deadline: deadline ? deadline.format("YYYY-MM-DD HH:mm") : "",
       priority,
       status,
+      deferredDate: deferredDate ? deferredDate.format("YYYY-MM-DD") : "",
     };
     addTaskToList(newTask, taskToEdit);
+    showMessage(`Task successful ${taskToEdit ? "edit" : "added"}`, "success");
     if (onClose) onClose();
   };
 
@@ -107,6 +244,10 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
     if (deadline && deadline.isBefore(dayjs())) {
       setError(t("error.deadlinePast"));
+      return;
+    }
+    if (deferredDate && deferredDate.isBefore(dayjs())) {
+      setError("deferredPast");
       return;
     }
 
@@ -126,108 +267,103 @@ const TaskModal: React.FC<TaskModalProps> = ({
     closeModal(CONFIRM_MODAL_ID);
   };
 
-  const handlePriorityChange = (
-    event: SelectChangeEvent<"low" | "medium" | "high">
-  ) => {
-    setPriority(event.target.value as "low" | "medium" | "high");
+  const toggleTag = (tag: string) => {
+    setTags((prevTags) =>
+      prevTags.includes(tag)
+        ? prevTags.filter((t) => t !== tag)
+        : [...prevTags, tag]
+    );
   };
 
   return (
-    <Modal
-      open
-      onClose={closeModal}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          {title}
-        </Typography>
+    <Overlay id="overlay">
+      <ModalContent theme={theme}>
+        <Title theme={theme}>{title}</Title>
 
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
 
-        <TextField
-          onChange={(e) => setTaskTitle(e.target.value)}
+        <Input
+          theme={theme}
           value={taskTitle}
-          id="taskName"
-          label={t("taskName")}
-          variant="filled"
-          margin="normal"
-          fullWidth
+          onChange={(e) => setTaskTitle(e.target.value)}
+          placeholder={t("taskName")}
         />
-        <TextField
-          onChange={(e) => setDescription(e.target.value)}
+        <TextArea
+          theme={theme}
           value={description}
-          id="Description"
-          label={t("description")}
-          variant="filled"
-          margin="normal"
-          fullWidth
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder={t("description")}
+          rows={4}
         />
-        <ToggleButtonGroup
-          color="primary"
-          value={formats}
-          onChange={(event, newFormats) => setFormats(newFormats)}
-          aria-label="Tags"
-          fullWidth
-        >
+
+        <TagGroup>
           {basicTags.map((tag) => (
-            <ToggleButton
-              selected={tags.includes(tag)}
-              onClick={() =>
-                setTags(
-                  tags.includes(tag)
-                    ? tags.filter((t) => t !== tag)
-                    : [...tags, tag]
-                )
-              }
+            <TagButton
               key={tag}
-              value={tag}
+              theme={theme}
+              selected={tags.includes(tag)}
+              onClick={() => toggleTag(tag)}
             >
               {t(`tags.${tag}`)}
-            </ToggleButton>
+            </TagButton>
           ))}
-        </ToggleButtonGroup>
+        </TagGroup>
 
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DemoContainer components={["DateTimePicker"]}>
-            <DateTimePicker
-              value={deadline}
-              onChange={(newValue) => setDeadline(newValue)}
-              label={t("deadline")}
-            />
-          </DemoContainer>
-        </LocalizationProvider>
+        <DateTimeInput
+          theme={theme}
+          type="datetime-local"
+          value={deadline ? deadline.format("YYYY-MM-DDTHH:mm") : ""}
+          onChange={(e) => setDeadline(dayjs(e.target.value))}
+        />
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel>{t("priority")}</InputLabel>
-          <Select
-            value={priority}
-            onChange={handlePriorityChange}
-            label={t("priority")}
+        <Select
+          theme={theme}
+          value={priority}
+          onChange={(e) =>
+            setPriority(e.target.value as "low" | "medium" | "high")
+          }
+        >
+          {priorityOptions.map((option) => (
+            <option key={option} value={option}>
+              {t(`priorityOptions.${option}`)}
+            </option>
+          ))}
+        </Select>
+        <div>
+          <Button
+            theme={theme}
+            variant="secondary"
+            onClick={() => setShowDatePicker(!showDatePicker)}
           >
-            {priorityOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {t(`priorityOptions.${option}`)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            {t("deferredTask")}
+          </Button>
 
-        <Box display="flex" justifyContent="space-between" mt={2}>
-          <Button onClick={onClose} variant="contained" color="secondary">
+          {showDatePicker && (
+            <DateTimeContainer>
+              <DateTimeInput
+                theme={theme}
+                type="date"
+                value={deferredDate ? deferredDate.format("YYYY-MM-DD") : ""}
+                onChange={(e) => setDeferredDate(dayjs(e.target.value))}
+              />
+            </DateTimeContainer>
+          )}
+        </div>
+
+        <ButtonGroup>
+          <Button theme={theme} variant="secondary" onClick={onClose}>
             {t("cancel")}
           </Button>
           <Button
+            theme={theme}
+            variant="primary"
             onClick={taskToEdit ? handleEdit : handleSave}
-            variant="contained"
-            color="primary"
           >
             {button}
           </Button>
-        </Box>
-      </Box>
-    </Modal>
+        </ButtonGroup>
+      </ModalContent>
+    </Overlay>
   );
 };
 

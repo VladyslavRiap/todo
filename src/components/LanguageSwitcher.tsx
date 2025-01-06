@@ -1,22 +1,76 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Menu, MenuItem } from "@mui/material";
+import styled from "styled-components";
+import { useThemeContext } from "../contexts/ThemesContext";
+import { Button } from "./utils/commonStyles";
+import useClickOutside from "./utils/otsideClick";
+import { useNavigate, useParams } from "react-router-dom";
 
-const LanguageSwitcher = () => {
+const Wrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const Menu = styled.ul<{ theme: string; isOpen: boolean }>`
+  position: absolute;
+  top: 60%;
+  left: 0;
+  background: ${(props) => (props.theme === "dark" ? "#333" : "white")};
+  background-color: ${({ theme }) => (theme === "light" ? "#fff" : "#222")};
+  color: ${(props) => (props.theme === "dark" ? "#fff" : "#000")};
+  border: 1px solid ${(props) => (props.theme === "dark" ? "#555" : "#ccc")};
+  border-radius: 8px;
+  box-shadow: 0 4px 6px
+    ${({ theme }) =>
+      theme === "light" ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.5)"};
+  padding: 10px;
+  display: ${(props) => (props.isOpen ? "block" : "none")};
+  z-index: 10;
+  width: 120px;
+  font-size: 12px;
+  list-style-type: none;
+  @media (max-width: 768px) {
+    width: 120px;
+    right: auto;
+    left: 0;
+  }
+`;
+const MenuItem = styled.li<{ theme: string }>`
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  color: ${({ theme }) => (theme === "light" ? "#333" : "#ddd")};
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: ${({ theme }) =>
+      theme === "light" ? "#f0f0f0" : "#333"};
+  }
+`;
+
+interface LanguageSwitcherProps {
+  theme?: string;
+}
+
+const LanguageSwitcher: React.FC<LanguageSwitcherProps> = () => {
   const { i18n } = useTranslation();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const { theme } = useThemeContext();
+  const navigate = useNavigate();
+  const { lang } = useParams<{ lang: string }>();
 
-  const open = Boolean(anchorEl);
+  const toggleMenu = () => setIsOpen(!isOpen);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
+  const closeMenu = (languageCode: string) => {
+    setIsOpen(false);
+    if (languageCode !== lang) {
+      i18n.changeLanguage(languageCode); // Меняем язык в i18n
+      navigate(`/${languageCode}`); // Обновляем URL
+    }
   };
 
-  const handleClose = (lang?: string) => {
-    setAnchorEl(null);
-    if (lang) {
-      i18n.changeLanguage(lang);
-    }
+  const closeMenuWithOutSave = () => {
+    setIsOpen(false);
   };
 
   const currentLanguage =
@@ -26,22 +80,33 @@ const LanguageSwitcher = () => {
       ? "Українська"
       : "English";
 
+  const menuRef = useRef<HTMLDivElement>(null);
+  useClickOutside(menuRef, () => setIsOpen(false));
+
   return (
-    <div>
-      <Button variant="contained" onClick={handleClick}>
+    <Wrapper ref={menuRef}>
+      <Button
+        variant={theme === "light" ? "primary" : "secondary"}
+        onMouseEnter={toggleMenu}
+        onClick={toggleMenu}
+        theme={theme}
+      >
         {currentLanguage}
       </Button>
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={() => handleClose()}
-        keepMounted
-      >
-        <MenuItem onClick={() => handleClose("en")}>English</MenuItem>
-        <MenuItem onClick={() => handleClose("ru")}>Русский</MenuItem>
-        <MenuItem onClick={() => handleClose("ukr")}>Українська</MenuItem>
-      </Menu>
-    </div>
+      {isOpen && (
+        <Menu onMouseLeave={closeMenuWithOutSave} isOpen={isOpen} theme={theme}>
+          <MenuItem onClick={() => closeMenu("en")} theme={theme}>
+            English
+          </MenuItem>
+          <MenuItem onClick={() => closeMenu("ru")} theme={theme}>
+            Русский
+          </MenuItem>
+          <MenuItem onClick={() => closeMenu("ukr")} theme={theme}>
+            Українська
+          </MenuItem>
+        </Menu>
+      )}
+    </Wrapper>
   );
 };
 

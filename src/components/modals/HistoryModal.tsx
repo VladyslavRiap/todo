@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Modal,
-  Card,
-  CardContent,
-  Divider,
-} from "@mui/material";
+import styled from "styled-components";
 import { TaskType } from "../../features/tasks/tasksSlice";
 import { useTranslation } from "react-i18next";
 import {
@@ -15,142 +7,170 @@ import {
   getLocalizedValue,
   translateTags,
 } from "../utils/languageUtils";
-
-const style = {
-  position: "absolute" as const,
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 600,
-  bgcolor: "background.paper",
-  borderRadius: 6,
-  boxShadow: 24,
-  p: 4,
-  maxHeight: "80vh",
-  overflowY: "auto",
-};
+import { useThemeContext } from "../../contexts/ThemesContext";
+import { ModalBox, Overlay, CloseButton, Header } from "../utils/commonStyles";
 
 type HistoryModalType = {
   taskToHistory: TaskType;
   onClose: () => void;
 };
 
+const Title = styled.h2<{ theme: string }>`
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+`;
+
+const SubTitle = styled.p<{ theme: string }>`
+  font-size: 14px;
+  color: ${({ theme }) => (theme === "dark" ? "#bbb" : "#666")};
+  margin: 4px 0;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
+
+const HistoryList = styled.div`
+  margin-top: 16px;
+
+  @media (max-width: 768px) {
+    margin-top: 12px;
+  }
+`;
+
+const HistoryCard = styled.div<{ theme: string }>`
+  background: ${({ theme }) => (theme === "dark" ? "#444" : "#f9f9f9")};
+  border: 1px solid ${({ theme }) => (theme === "dark" ? "#555" : "#ddd")};
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    padding: 12px;
+  }
+`;
+
+const Timestamp = styled.p<{ theme: string }>`
+  font-size: 12px;
+  color: ${({ theme }) => (theme === "dark" ? "#aaa" : "#666")};
+  margin: 0 0 8px 0;
+
+  @media (max-width: 768px) {
+    font-size: 11px;
+  }
+`;
+
+const ChangeItem = styled.li<{ theme: string }>`
+  font-size: 14px;
+  color: ${({ theme }) => (theme === "dark" ? "#ddd" : "#333")};
+  margin-bottom: 8px;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+`;
+
+const Footer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+`;
+
+const ConfirmButton = styled.button<{ theme: string }>`
+  background: ${({ theme }) => (theme === "dark" ? "#f44336" : "#f44336")};
+  color: #fff;
+  font-size: 16px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:hover {
+    background: ${({ theme }) => (theme === "dark" ? "#d32f2f" : "#d32f2f")};
+  }
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+`;
+
 const HistoryModal: React.FC<HistoryModalType> = ({
   taskToHistory,
   onClose,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useThemeContext();
 
   return (
-    <Modal
-      open
-      onClose={onClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
-      <Box sx={style}>
-        <Box display={"flex"} justifyContent={"space-between"}>
-          <Typography
-            id="modal-title"
-            variant="h6"
-            fontWeight="bold"
-            gutterBottom
-          >
-            🕒 {t("history")}
-          </Typography>
-          <Box>
-            <Typography id="modal-description" variant="subtitle1" gutterBottom>
-              {taskToHistory.title}
-            </Typography>
-            <Typography
-              id="modal-description2"
-              variant="subtitle2"
-              gutterBottom
-            >
+    <Overlay id="overlay">
+      <ModalBox theme={theme}>
+        <Header>
+          <div>
+            <Title theme={theme}>🕒 {t("history")}</Title>
+            <SubTitle theme={theme}>{taskToHistory.title}</SubTitle>
+            <SubTitle theme={theme}>
               {t("created")}: {taskToHistory.timestampCreateTask}
-            </Typography>
-          </Box>
-          <Button
-            style={{ marginBottom: "10px" }}
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={onClose}
-          >
-            X
-          </Button>
-        </Box>
+            </SubTitle>
+          </div>
+          <CloseButton theme={theme} onClick={onClose}>
+            &times;
+          </CloseButton>
+        </Header>
 
         {taskToHistory.history && taskToHistory.history.length > 0 ? (
-          <Box>
+          <HistoryList>
             {taskToHistory.history.map((entry, index) => (
-              <React.Fragment key={index}>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    mb: 2,
-                    bgcolor: "background.default",
-                    boxShadow: 1,
-                    borderRadius: 2,
-                  }}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="subtitle2"
-                      color="text.secondary"
-                      gutterBottom
-                    >
-                      {entry.timestamp}
-                    </Typography>
-                    <Box component="ul" sx={{ pl: 2 }}>
-                      {entry.changes.map((change, changeIndex) => {
-                        const [field, values] = change.split(": ");
-                        let [oldValue, newValue] = values.split(" → ");
-                        if (field === "tags") {
-                          oldValue = translateTags(oldValue, t);
-                          newValue = translateTags(newValue, t);
-                        } else {
-                          oldValue = getLocalizedValue(oldValue, t);
-                          newValue = getLocalizedValue(newValue, t);
-                        }
-                        return (
-                          <Typography
-                            key={changeIndex}
-                            variant="body2"
-                            color="text.primary"
-                            component="li"
-                            sx={{ mb: 0.5 }}
-                          >
-                            {getChangeLabel(change, t)}: {oldValue} → {newValue}
-                          </Typography>
-                        );
-                      })}
-                    </Box>
-                  </CardContent>
-                </Card>
-                {taskToHistory.history &&
-                  index < taskToHistory.history.length - 1 && <Divider />}
-              </React.Fragment>
+              <HistoryCard key={index} theme={theme}>
+                <Timestamp theme={theme}>{entry.timestamp}</Timestamp>
+                <ul>
+                  {entry.changes.map((change, changeIndex) => {
+                    const [field, values] = change.split(/:\s(.+)/);
+                    let [oldValue, newValue] = values.split(" → ");
+
+                    if (field === "tags") {
+                      oldValue = oldValue ? translateTags(oldValue, t) : "";
+                      newValue = newValue ? translateTags(newValue, t) : "";
+                    } else {
+                      oldValue = getLocalizedValue(oldValue, t, field);
+                      newValue = getLocalizedValue(newValue, t, field);
+                    }
+
+                    if (oldValue || newValue) {
+                      return (
+                        <ChangeItem key={changeIndex} theme={theme}>
+                          {getChangeLabel(field, t)}: {oldValue} → {newValue}
+                        </ChangeItem>
+                      );
+                    }
+                    return null;
+                  })}
+                </ul>
+              </HistoryCard>
             ))}
-          </Box>
+          </HistoryList>
         ) : (
-          <Typography variant="body1" color="text.secondary">
-            {t("noHistory")}
-          </Typography>
+          <SubTitle theme={theme}>{t("noHistory")}</SubTitle>
         )}
 
-        <Box display="flex" justifyContent="flex-end" mt={3}>
-          <Button
-            variant="contained"
-            color="error"
-            size="large"
-            onClick={onClose}
-          >
+        <Footer>
+          <ConfirmButton theme={theme} onClick={onClose}>
             {t("close")}
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+          </ConfirmButton>
+        </Footer>
+      </ModalBox>
+    </Overlay>
   );
 };
 

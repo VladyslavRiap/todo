@@ -3,18 +3,69 @@
   "newTask": "Нове завдання",
   "buttonAdd": "Додати завдання",
   "filters": "Фільтри",
+
   "taskName": "Назва завдання",
   "description": "Опис",
+  "deadline": "Термін виконання",
   "priority": "Пріоритет",
   "cancel": "Скасувати",
   "error": {
-    "titleRequired": "Назва обов'язкова.",
-    "deadlinePast": "Дедлайн не може бути в минулому."
+    "titleRequired": "Назва є обов’язковою.",
+    "deadlinePast": "Термін виконання не може бути у минулому."
   },
   "confirm": {
     "message": "Підтвердити зміни?",
     "confirm": "Підтвердити"
   },
+  "columns": {
+    "todo": "До виконання",
+    "inProgress": "В процесі",
+    "done": "Виконано"
+  },
+  "lockColumn": "Заблокувати колонку",
+  "unlockColumn": "Розблокувати колонку",
+  "sortBy": "Сортувати за",
+  "editTask": "Редагувати завдання",
+  "edit": "Редагувати",
+
+  "delete": "Видалити",
+  "Work": "Робота",
+  "Private": "Особисте",
+  "Studying": "Навчання",
+  "Shopping": "Покупки",
+  "sort": "Сортування",
+  "sortLowToHigh": "Сортувати від низького до високого",
+  "sortHighToLow": "Сортувати від високого до низького",
+  "reset": "Скинути",
+  "filterByTags": "Фільтрувати за мітками",
+  "filterByDeadline": "Фільтрувати за терміном",
+  "filterByPriority": "Фільтрувати за пріоритетом",
+  "apply": "Застосувати",
+  "deadlines": {
+    "1_day": "1 день",
+    "7_days": "7 днів",
+    "monthly": "Щомісяця"
+  },
+
+  "close": "Закрити",
+  "title": "Назва",
+
+  "status": "Статус",
+  "changeKeys": {
+    "title": "Назва: '{{oldValue}}' → '{{newValue}}'",
+    "description": "Опис: '{{oldValue}}' → '{{newValue}}'",
+    "tags": "Мітки: '{{oldValue}}' → '{{newValue}}'",
+    "deadline": "Термін виконання: '{{oldValue}}' → '{{newValue}}'",
+    "priority": "Пріоритет: '{{oldValue}}' → '{{newValue}}'",
+    "status": "Статус: '{{oldValue}}' → '{{newValue}}'"
+  },
+  "history": "Історія",
+  "created": "Створено",
+  "noHistory": "Історія відсутня",
+  "change": "Зміна",
+  "titleChange": "Назва",
+  "tagsChange": "Мітки",
+  "priorityChange": "Пріоритет",
   "tags": {
     "Work": "Робота",
     "Private": "Особисте",
@@ -26,45 +77,15 @@
     "medium": "Середній",
     "high": "Високий"
   },
-  "columns": {
-    "todo": "До виконання",
-    "inProgress": "У процесі",
-    "done": "Виконано"
-  },
-  "lockColumn": "Заблокувати колонку",
-  "unlockColumn": "Розблокувати колонку",
-  "sortBy": "Сортувати за",
-  "editTask": "Редагувати завдання",
-  "edit": "Редагувати",
-  "history": "Історія",
-  "delete": "Видалити",
-  "deadline": "Кінцевий термін",
-  "Work": "Робота",
-  "Private": "Особисте",
-  "Studying": "Навчання",
-  "Shopping": "Покупки",
-  "sort": "Сортувати",
-  "sortLowToHigh": "Сортувати від низького до високого",
-  "sortHighToLow": "Сортувати від високого до низького",
-  "reset": "Скинути",
-  "filterByTags": "Фільтрувати за тегами",
-  "filterByDeadline": "Фільтрувати за кінцевим терміном",
-  "filterByPriority": "Фільтрувати за пріоритетом",
-  "apply": "Застосувати",
-  "deadlines": {
-    "1_day": "1 день",
-    "7_days": "7 днів",
-    "monthly": "Щомісяця"
-  },
-  "created": "Створено",
-  "noHistory": "Історія відсутня",
-  "close": "Закрити",
-  "changeTitle": "Заголовок",
-  "changeDescription": "Опис",
-  "title": "Заголовок",
-  "status": "Статус",
-  "change": "Зміна",
-  "titleChange": "Назва",
-  "tagsChange": "Теги",
-  "priorityChange": "Пріоритет"
+  "dark": "темна",
+  "light": "світла",
+
+  "task": "Завдання",
+  "deadlineNotification": "Завдання \"{{title}}\" прострочено на {{minutes}} хвилин!",
+  "deferredTask": "Відкладене завдання",
+  "deferredTasks": "Відкладені завдання",
+  "expiredTask": "Прострочені завдання",
+  "deferredDate": "Завдання буде додано",
+  "Restoretask": "Відновити",
+  "Delete": "Видалити"
 }

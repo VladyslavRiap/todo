@@ -1,20 +1,13 @@
-import React, { useState, MouseEvent, ChangeEvent } from "react";
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  FormGroup,
-  FormControlLabel,
-  RadioGroup,
-  Radio,
-  Box,
-} from "@mui/material";
+import React, { useState, MouseEvent, ChangeEvent, useRef } from "react";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { useThemeContext } from "../contexts/ThemesContext";
+import { Button } from "./utils/commonStyles";
+import useClickOutside from "./utils/otsideClick";
 
-const tags = ["Work", "Private", "Studying", "Shopping"];
-const deadlines = ["1 day", "7 days", "monthly"];
+export const tags = ["Work", "Private", "Studying", "Shopping"];
+export const deadlines = ["1 day", "7 days", "monthly"];
+export const priorities = ["low", "medium", "high"];
 
 interface FilterMenuProps {
   setFilters: (filters: {
@@ -24,44 +17,120 @@ interface FilterMenuProps {
   }) => void;
 }
 
+const Container = styled.div`
+  position: relative;
+`;
+
+const Menu = styled.div<{ isOpen: boolean; theme: string }>`
+  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+  flex-direction: column;
+  position: absolute;
+  background-color: ${(props) => (props.theme === "light" ? "#fff" : "#222")};
+  border: 1px solid ${(props) => (props.theme === "light" ? "#ccc" : "#444")};
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  z-index: 1000;
+  min-width: 300px;
+  padding: 10px;
+  right: 0;
+  @media (max-width: 768px) {
+    min-width: 100%;
+    padding: 5px;
+  }
+`;
+
+const Section = styled.div`
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+
+  &:last-child {
+    border-bottom: none;
+  }
+  @media (max-width: 768px) {
+    padding: 5px;
+  }
+`;
+
+const SectionTitle = styled.h4<{ theme: string }>`
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: ${(props) => (props.theme === "light" ? "#333" : "#fff")};
+  @media (max-width: 768px) {
+    margin-bottom: 3px;
+    font-size: 10px;
+  }
+`;
+
+const CheckboxLabel = styled.label<{ theme: string }>`
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: ${(props) => (props.theme === "light" ? "#333" : "#ddd")};
+
+  input {
+    margin-right: 8px;
+  }
+  @media (max-width: 768px) {
+    margin-bottom: 3px;
+    font-size: 10px;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  @media (max-width: 768px) {
+    padding: 12px;
+  }
+`;
+
+const ResetButton = styled.button<{ theme: string }>`
+  margin-bottom: 10px;
+  padding: 8px 16px;
+  border: none;
+  background-color: ${(props) => (props.theme === "light" ? "#ccc" : "#555")};
+  color: ${(props) => (props.theme === "light" ? "#333" : "#ddd")};
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${(props) => (props.theme === "light" ? "#bbb" : "#444")};
+  }
+`;
+
+const ApplyButton = styled(ResetButton)`
+  background-color: ${(props) =>
+    props.theme === "light" ? "#28a745" : "#3aaf3a"};
+  color: #fff;
+
+  &:hover {
+    background-color: ${(props) =>
+      props.theme === "light" ? "#218838" : "#2e8a2e"};
+  }
+`;
+
 const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDeadline, setSelectedDeadline] = useState<string>("");
   const [selectedPriority, setSelectedPriority] = useState<string>("");
   const { t } = useTranslation();
+  const { theme } = useThemeContext();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const handleOpen = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleTagChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const tag = event.target.value;
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
-
-  const handleDeadlineChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setSelectedDeadline(event.target.value);
-  };
-
-  const handlePriorityChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value as "high" | "medium" | "low";
-    setSelectedPriority(value);
+  const toggleMenu = (event: MouseEvent<HTMLButtonElement>) => {
+    setIsOpen((prev) => !prev);
   };
 
   const applyFilters = () => {
     setFilters({
       tags: selectedTags.length ? selectedTags : undefined,
       deadline: selectedDeadline || undefined,
-      priority: (selectedPriority as "high" | "medium" | "low") || undefined,
+      priority: selectedPriority as "high" | "medium" | "low",
     });
-    handleClose();
+    setIsOpen(false);
   };
 
   const resetFilters = () => {
@@ -71,106 +140,85 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
     setFilters({});
   };
 
+  const handleTagChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const tag = event.target.value;
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const handleRadioChange =
+    (setter: React.Dispatch<React.SetStateAction<string>>) =>
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setter(event.target.value);
+    };
+
+  useClickOutside(menuRef, () => setIsOpen(false));
+
   return (
-    <div>
+    <Container ref={menuRef}>
       <Button
-        aria-controls="filter-menu"
-        aria-haspopup="true"
-        onMouseEnter={handleOpen}
-        onClick={handleOpen}
+        variant={theme === "light" ? "primary" : "secondary"}
+        onClick={toggleMenu}
+        theme={theme}
       >
         {t("filters")}
       </Button>
-      <Menu
-        style={{ display: "flex", flexDirection: "row" }}
-        id="filter-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        MenuListProps={{ onMouseLeave: handleClose }}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-      >
-        <Box display="flex" flexDirection="row" padding={2}>
-          <Box flex={1} paddingBottom={2}>
-            <MenuItem disabled>
-              <ListItemText primary={t("filterByTags")} />{" "}
-            </MenuItem>
-            <FormGroup>
-              {tags.map((tag) => (
-                <FormControlLabel
-                  key={tag}
-                  control={
-                    <Checkbox
-                      checked={selectedTags.includes(tag)}
-                      onChange={handleTagChange}
-                      value={tag}
-                    />
-                  }
-                  label={t(`tags.${tag}`)}
-                />
-              ))}
-            </FormGroup>
-          </Box>
-
-          <Box flex={1} paddingBottom={2}>
-            <MenuItem disabled>
-              <ListItemText primary={t("filterByDeadline")} />{" "}
-            </MenuItem>
-            <RadioGroup
-              value={selectedDeadline}
-              onChange={handleDeadlineChange}
-            >
-              {deadlines.map((deadline) => (
-                <FormControlLabel
-                  key={deadline}
-                  value={deadline}
-                  control={<Radio />}
-                  label={t(
-                    `deadlines.${deadline.replace(" ", "_").toLowerCase()}`
-                  )}
-                />
-              ))}
-            </RadioGroup>
-          </Box>
-
-          <Box flex={1} paddingBottom={2}>
-            <MenuItem disabled>
-              <ListItemText primary={t("filterByPriority")} />{" "}
-            </MenuItem>
-            <RadioGroup
-              value={selectedPriority}
-              onChange={handlePriorityChange}
-            >
-              {["low", "medium", "high"].map((priority) => (
-                <FormControlLabel
-                  key={priority}
-                  value={priority}
-                  control={<Radio />}
-                  label={t(`priorityOptions.${priority}`)}
-                />
-              ))}
-            </RadioGroup>
-          </Box>
-        </Box>
-
-        <Box display="flex" justifyContent="space-between" padding={2}>
-          <Button onClick={resetFilters} variant="outlined" color="secondary">
+      <Menu isOpen={isOpen} theme={theme}>
+        <Section>
+          <SectionTitle theme={theme}>{t("filterByTags")}</SectionTitle>
+          {tags.map((tag) => (
+            <CheckboxLabel key={tag} theme={theme}>
+              <input
+                type="checkbox"
+                value={tag}
+                checked={selectedTags.includes(tag)}
+                onChange={handleTagChange}
+              />
+              {t(`tags.${tag}`)}
+            </CheckboxLabel>
+          ))}
+        </Section>
+        <Section>
+          <SectionTitle theme={theme}>{t("filterByDeadline")}</SectionTitle>
+          {deadlines.map((deadline) => (
+            <CheckboxLabel key={deadline} theme={theme}>
+              <input
+                type="radio"
+                name="deadline"
+                value={deadline}
+                checked={selectedDeadline === deadline}
+                onChange={handleRadioChange(setSelectedDeadline)}
+              />
+              {t(`deadlines.${deadline.replace(" ", "_").toLowerCase()}`)}
+            </CheckboxLabel>
+          ))}
+        </Section>
+        <Section>
+          <SectionTitle theme={theme}>{t("filterByPriority")}</SectionTitle>
+          {priorities.map((priority) => (
+            <CheckboxLabel key={priority} theme={theme}>
+              <input
+                type="radio"
+                name="priority"
+                value={priority}
+                checked={selectedPriority === priority}
+                onChange={handleRadioChange(setSelectedPriority)}
+              />
+              {t(`priorityOptions.${priority}`)}
+            </CheckboxLabel>
+          ))}
+        </Section>
+        <ButtonContainer>
+          <ResetButton onClick={resetFilters} theme={theme}>
             {t("reset")}
-          </Button>
-          <Button onClick={applyFilters} variant="contained" color="primary">
+          </ResetButton>
+          <ApplyButton onClick={applyFilters} theme={theme}>
             {t("apply")}
-          </Button>
-        </Box>
+          </ApplyButton>
+        </ButtonContainer>
       </Menu>
-    </div>
+    </Container>
   );
 };
 

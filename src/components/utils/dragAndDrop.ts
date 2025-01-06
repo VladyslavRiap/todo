@@ -2,7 +2,17 @@ import { useState } from "react";
 import { arrayMove } from "@dnd-kit/sortable";
 import { TaskType, updateTaskOrder } from "../../features/tasks/tasksSlice";
 import { useDispatch } from "react-redux";
-import { DragEndEvent, DragOverEvent, DragStartEvent } from "@dnd-kit/core";
+import {
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  MouseSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import {
   ColumnType,
   setColumns,
@@ -20,6 +30,25 @@ export function useDragAndDrop(
 
   const dispatch = useDispatch();
 
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 0,
+        tolerance: 0,
+      },
+    }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
+
   const onClickLock = (status: TaskType["status"]) => {
     dispatch(toggleLock(status));
     setColumnsState(
@@ -34,8 +63,10 @@ export function useDragAndDrop(
   };
 
   function onDragStart(event: DragStartEvent) {
-    if (event.active.data.current?.type === "column") {
-      const column = event.active.data.current?.column;
+    const { current } = event.active.data;
+
+    if (current?.type === "column") {
+      const column = current.column;
       if (column?.isLock) {
         setActiveColumn(null);
         return;
@@ -44,8 +75,8 @@ export function useDragAndDrop(
       }
     }
 
-    if (event.active.data.current?.type === "task") {
-      setActiveTask(event.active.data.current.task);
+    if (current?.type === "task") {
+      setActiveTask(current.task);
     }
   }
 
@@ -141,5 +172,6 @@ export function useDragAndDrop(
     onDragOver,
     onDragEnd,
     onClickLock,
+    sensors,
   };
 }

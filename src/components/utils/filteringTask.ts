@@ -1,4 +1,3 @@
-// utils/filterTasks.ts
 import dayjs from "dayjs";
 import { TaskType } from "../../features/tasks/tasksSlice";
 type DeadlineFilter = "1 day" | "7 days" | "monthly";

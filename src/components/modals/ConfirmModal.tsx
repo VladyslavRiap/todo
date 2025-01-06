@@ -1,26 +1,53 @@
 import React from "react";
-import { Box, Typography, Button, Modal } from "@mui/material";
+import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { useThemeContext } from "../../contexts/ThemesContext";
+import { Button, Overlay, Title } from "../utils/commonStyles";
 
 interface ConfirmModalProps {
   message?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  theme: "dark" | "light";
 }
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-};
+const ModalBox = styled.div<{ theme: string }>`
+  background: ${({ theme }) => (theme === "dark" ? "#333" : "#fff")};
+  color: ${({ theme }) => (theme === "dark" ? "#fff" : "#000")};
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 15px;
+    max-width: 90%;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 10px;
+  }
+`;
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
   message,
@@ -28,27 +55,21 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useThemeContext();
   return (
-    <Modal
-      open
-      onClose={onCancel}
-      aria-labelledby="child-modal-title"
-      aria-describedby="child-modal-description"
-    >
-      <Box sx={{ ...style, width: 200 }}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          {message}
-        </Typography>
-        <Box display="flex" justifyContent="space-between" mt={2}>
-          <Button onClick={onCancel} variant="contained" color="secondary">
+    <Overlay id="overlay">
+      <ModalBox theme={theme}>
+        <Title theme={theme}>{message}</Title>
+        <ButtonContainer>
+          <Button theme={theme} variant="secondary" onClick={onCancel}>
             {t("cancel")}
           </Button>
-          <Button onClick={onConfirm} variant="contained" color="primary">
+          <Button theme={theme} variant="primary" onClick={onConfirm}>
             {t("confirm.confirm")}
           </Button>
-        </Box>
-      </Box>
-    </Modal>
+        </ButtonContainer>
+      </ModalBox>
+    </Overlay>
   );
 };
 

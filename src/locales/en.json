@@ -6,7 +6,7 @@
 
   "taskName": "Task Name",
   "description": "Description",
-  "deadline": "Deadline",
+  "deadline": "Due to",
   "priority": "Priority",
   "cancel": "Cancel",
   "error": {
@@ -55,7 +55,7 @@
     "title": "Title: '{{oldValue}}' → '{{newValue}}'",
     "description": "Description: '{{oldValue}}' → '{{newValue}}'",
     "tags": "Tags: '{{oldValue}}' → '{{newValue}}'",
-    "deadline": "Deadline: '{{oldValue}}' → '{{newValue}}'",
+    "deadline": "Due to   : '{{oldValue}}' → '{{newValue}}'",
     "priority": "Priority: '{{oldValue}}' → '{{newValue}}'",
     "status": "Status: '{{oldValue}}' → '{{newValue}}'"
   },
@@ -72,5 +72,16 @@
     "Studying": "Studying",
     "Shopping": "Shopping"
   },
-  "priorityOptions": { "low": "Low", "medium": "Medium", "high": "High" }
+  "priorityOptions": { "low": "Low", "medium": "Medium", "high": "High" },
+  "dark": "dark",
+  "light": "light",
+
+  "task": "Task",
+  "deadlineNotification": "Task \"{{title}}\" expired after {{minutes}} minutes!",
+  "deferredTask": "Deferred task",
+  "deferredTasks": "Deferred tasks",
+  "expiredTask": "Expired tasks",
+  "deferredDate": "Task will be add",
+  "Restoretask": "Restore",
+  "Delete": "Delete"
 }
