@@ -249,7 +249,8 @@ const Column: React.FC<ColumnProps> = ({
       theme={theme}
     >
       <ColumnHeader theme={theme}>
-        <ColumnTitle theme={theme}>{t(title)}</ColumnTitle>
+        <ColumnTitle theme={theme}>{t(`columns.${title}`)}</ColumnTitle>
+
         <SortMenu onSort={handleSort} />
         <LockButton theme={theme} onClick={() => onClickLock(status)}>
           {isLock ? (

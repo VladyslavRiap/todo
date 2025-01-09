@@ -1,9 +1,16 @@
-import React, { useState, MouseEvent, ChangeEvent, useRef } from "react";
+import React, {
+  useState,
+  MouseEvent,
+  ChangeEvent,
+  useRef,
+  useEffect,
+} from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useThemeContext } from "../contexts/ThemesContext";
 import { Button } from "./utils/commonStyles";
 import useClickOutside from "./utils/otsideClick";
+import { useSearchParams } from "react-router-dom";
 
 export const tags = ["Work", "Private", "Studying", "Shopping"];
 export const deadlines = ["1 day", "7 days", "monthly"];
@@ -116,19 +123,49 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedDeadline, setSelectedDeadline] = useState<string>("");
   const [selectedPriority, setSelectedPriority] = useState<string>("");
+
   const { t } = useTranslation();
   const { theme } = useThemeContext();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const syncFiltersFromQuery = () => {
+    const tagsParam = searchParams.get("tags");
+    const deadlineParam = searchParams.get("deadline");
+    const priorityParam = searchParams.get("priority");
+
+    const newFilters = {
+      tags: tagsParam ? tagsParam.split(",") : [],
+      deadline: deadlineParam || "",
+      priority: (priorityParam as "low" | "medium" | "high") || "",
+    };
+
+    setSelectedTags(newFilters.tags);
+    setSelectedDeadline(newFilters.deadline);
+    setSelectedPriority(newFilters.priority);
+    setFilters(newFilters);
+  };
+
+  useEffect(() => {
+    syncFiltersFromQuery();
+  }, [searchParams]);
 
   const toggleMenu = (event: MouseEvent<HTMLButtonElement>) => {
     setIsOpen((prev) => !prev);
   };
 
   const applyFilters = () => {
+    const filters: Record<string, string> = {};
+    if (selectedTags.length) filters.tags = selectedTags.join(",");
+    if (selectedDeadline) filters.deadline = selectedDeadline;
+    if (selectedPriority) filters.priority = selectedPriority;
+
+    setSearchParams(filters);
     setFilters({
       tags: selectedTags.length ? selectedTags : undefined,
       deadline: selectedDeadline || undefined,
-      priority: selectedPriority as "high" | "medium" | "low",
+      priority: (selectedPriority as "high" | "medium" | "low") || undefined,
     });
     setIsOpen(false);
   };
@@ -137,6 +174,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
     setSelectedTags([]);
     setSelectedDeadline("");
     setSelectedPriority("");
+    setSearchParams({});
     setFilters({});
   };
 
@@ -147,11 +185,13 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
     );
   };
 
-  const handleRadioChange =
-    (setter: React.Dispatch<React.SetStateAction<string>>) =>
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setter(event.target.value);
-    };
+  const handleDeadlineClick = (value: string) => {
+    setSelectedDeadline((prev) => (prev === value ? "" : value));
+  };
+
+  const handlePriorityClick = (value: string) => {
+    setSelectedPriority((prev) => (prev === value ? "" : value));
+  };
 
   useClickOutside(menuRef, () => setIsOpen(false));
 
@@ -188,7 +228,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
                 name="deadline"
                 value={deadline}
                 checked={selectedDeadline === deadline}
-                onChange={handleRadioChange(setSelectedDeadline)}
+                onClick={() => handleDeadlineClick(deadline)}
               />
               {t(`deadlines.${deadline.replace(" ", "_").toLowerCase()}`)}
             </CheckboxLabel>
@@ -203,7 +243,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
                 name="priority"
                 value={priority}
                 checked={selectedPriority === priority}
-                onChange={handleRadioChange(setSelectedPriority)}
+                onClick={() => handlePriorityClick(priority)}
               />
               {t(`priorityOptions.${priority}`)}
             </CheckboxLabel>

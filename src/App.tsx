@@ -15,9 +15,9 @@ import FilterMenu from "./components/FilterMenu";
 import { filterTasks } from "./components/utils/filteringTask";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import { DeadlineNotifier } from "./components/DeadLineNotice";
-import { useThemeContext } from "./contexts/ThemesContext";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
+
 import HamburgerMenu from "./components/HamburgerMenu";
+import ThemeToggle from "./components/ThemeToggle";
 
 const AppContainer = styled.div`
   padding: 16px;
@@ -57,38 +57,7 @@ const ColumnContainer = styled.div`
     height: auto;
   }
 `;
-const ThemeToggleContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background-color: ${({ theme }) =>
-    theme.mode === "light" ? "#f0f0f0" : "#333"};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
 
-  &:hover {
-    background-color: ${({ theme }) =>
-      theme.mode === "light" ? "#e0e0e0" : "#444"};
-    transform: scale(1.1);
-  }
-`;
-
-const ThemeIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => (theme.mode === "light" ? "#333" : "#f0f0f0")};
-  transition: color 0.3s ease;
-
-  svg {
-    width: 24px;
-    height: 24px;
-  }
-`;
 const DndContainer = styled.div`
   touch-action: none;
   user-select: none;
@@ -151,8 +120,6 @@ const App = () => {
     setFilteredTasks(result);
   }, [filters, tasksFromRedux]);
 
-  const { theme, toggleTheme } = useThemeContext();
-
   return (
     <AppContainer>
       <Header>
@@ -160,11 +127,7 @@ const App = () => {
         <ButtonContainer>
           <FilterMenu setFilters={setFilters} />
           <LanguageSwitcher />
-          <ThemeToggleContainer onClick={toggleTheme}>
-            <ThemeIcon>
-              {theme === "light" ? <MdDarkMode /> : <MdLightMode />}
-            </ThemeIcon>
-          </ThemeToggleContainer>
+          <ThemeToggle />
         </ButtonContainer>
       </Header>
       <DndContainer>
@@ -182,7 +145,7 @@ const App = () => {
                     onClickLock={onClickLock}
                     column={column}
                     status={column.status}
-                    title={t(`columns.${column.status}`)}
+                    title={column.status}
                     tasks={tasks.filter(
                       (task) => task.status === column.status
                     )}

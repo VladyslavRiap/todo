@@ -15,30 +15,31 @@ const Menu = styled.ul<{ theme: string; isOpen: boolean }>`
   position: absolute;
   top: 60%;
   left: 0;
-  background: ${(props) => (props.theme === "dark" ? "#333" : "white")};
   background-color: ${({ theme }) => (theme === "light" ? "#fff" : "#222")};
-  color: ${(props) => (props.theme === "dark" ? "#fff" : "#000")};
-  border: 1px solid ${(props) => (props.theme === "dark" ? "#555" : "#ccc")};
+  color: ${({ theme }) => (theme === "light" ? "#000" : "#fff")};
+  border: 1px solid ${({ theme }) => (theme === "light" ? "#ccc" : "#555")};
   border-radius: 8px;
   box-shadow: 0 4px 6px
     ${({ theme }) =>
       theme === "light" ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.5)"};
   padding: 10px;
-  display: ${(props) => (props.isOpen ? "block" : "none")};
+  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
   z-index: 10;
   width: 120px;
-  font-size: 12px;
-  list-style-type: none;
+  font-size: 14px;
+  list-style: none;
+
   @media (max-width: 768px) {
     width: 120px;
     right: auto;
     left: 0;
   }
 `;
+
 const MenuItem = styled.li<{ theme: string }>`
-  padding: 10px 20px;
+  padding: 8px 12px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   color: ${({ theme }) => (theme === "light" ? "#333" : "#ddd")};
   transition: background-color 0.3s ease;
 
@@ -48,64 +49,49 @@ const MenuItem = styled.li<{ theme: string }>`
   }
 `;
 
-interface LanguageSwitcherProps {
-  theme?: string;
-}
-
-const LanguageSwitcher: React.FC<LanguageSwitcherProps> = () => {
+const LanguageSwitcher: React.FC = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const { theme } = useThemeContext();
   const navigate = useNavigate();
+  const { theme } = useThemeContext();
   const { lang } = useParams<{ lang: string }>();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  useClickOutside(menuRef, () => setIsOpen(false));
 
-  const closeMenu = (languageCode: string) => {
-    setIsOpen(false);
-    if (languageCode !== lang) {
-      i18n.changeLanguage(languageCode); // Меняем язык в i18n
-      navigate(`/${languageCode}`); // Обновляем URL
+  const toggleMenu = () => setIsOpen((prev) => !prev);
+
+  const changeLanguage = (language: string) => {
+    if (lang !== language) {
+      i18n.changeLanguage(language);
+      navigate(`/${language}`);
+      setIsOpen(false);
     }
   };
 
-  const closeMenuWithOutSave = () => {
-    setIsOpen(false);
-  };
-
   const currentLanguage =
-    i18n.language === "ru"
-      ? "Русский"
-      : i18n.language === "ukr"
-      ? "Українська"
-      : "English";
-
-  const menuRef = useRef<HTMLDivElement>(null);
-  useClickOutside(menuRef, () => setIsOpen(false));
+    lang === "ru" ? "Русский" : lang === "ukr" ? "Українська" : "English";
 
   return (
     <Wrapper ref={menuRef}>
       <Button
         variant={theme === "light" ? "primary" : "secondary"}
-        onMouseEnter={toggleMenu}
         onClick={toggleMenu}
         theme={theme}
       >
         {currentLanguage}
       </Button>
-      {isOpen && (
-        <Menu onMouseLeave={closeMenuWithOutSave} isOpen={isOpen} theme={theme}>
-          <MenuItem onClick={() => closeMenu("en")} theme={theme}>
-            English
-          </MenuItem>
-          <MenuItem onClick={() => closeMenu("ru")} theme={theme}>
-            Русский
-          </MenuItem>
-          <MenuItem onClick={() => closeMenu("ukr")} theme={theme}>
-            Українська
-          </MenuItem>
-        </Menu>
-      )}
+      <Menu isOpen={isOpen} theme={theme}>
+        <MenuItem onClick={() => changeLanguage("en")} theme={theme}>
+          English
+        </MenuItem>
+        <MenuItem onClick={() => changeLanguage("ru")} theme={theme}>
+          Русский
+        </MenuItem>
+        <MenuItem onClick={() => changeLanguage("ukr")} theme={theme}>
+          Українська
+        </MenuItem>
+      </Menu>
     </Wrapper>
   );
 };

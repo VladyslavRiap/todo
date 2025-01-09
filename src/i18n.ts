@@ -10,6 +10,7 @@ i18n
   .use(initReactI18next)
   .init({
     debug: true,
+    supportedLngs: ["en", "ukr", "ru"],
     resources: {
       en: { translation: en },
       ru: { translation: ru },

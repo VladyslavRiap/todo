@@ -11,6 +11,8 @@ import App from "./App";
 import { SnackbarProvider } from "notistack";
 import { darkTheme, lightTheme } from "./themes/themes";
 import { SnackbarProviderWithContext } from "./contexts/SnackBarContext";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import LanguageWrapper from "./components/utils/LanguageWrapper";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -29,6 +31,11 @@ const ThemedApp: React.FC = () => {
     () => (theme === "light" ? lightTheme : darkTheme),
     [theme]
   );
+  const getStoredLanguage = () => {
+    const savedLang = localStorage.getItem("i18nextLng");
+    const supportedLanguages = ["en", "ru", "ukr"];
+    return supportedLanguages.includes(savedLang ?? "") ? savedLang : "en";
+  };
 
   return (
     <StyledThemeProvider theme={currentTheme}>
@@ -37,7 +44,24 @@ const ThemedApp: React.FC = () => {
         <SnackbarProviderWithContext>
           <ModalProvider>
             <DndProvider backend={HTML5Backend}>
-              <App />
+              <BrowserRouter>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      <Navigate to={`/${getStoredLanguage()}`} replace />
+                    }
+                  />
+                  <Route
+                    path=":lang/*"
+                    element={
+                      <LanguageWrapper>
+                        <App />
+                      </LanguageWrapper>
+                    }
+                  />
+                </Routes>
+              </BrowserRouter>
             </DndProvider>
           </ModalProvider>
         </SnackbarProviderWithContext>
