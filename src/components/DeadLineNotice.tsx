@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { checkDeadlines, updateTaskStatus } from "../features/tasks/tasksSlice";
+import { RootState, useAppDispatch } from "../store/store";
+import {
+  checkDeadlines,
+  updateTaskStatusApi,
+} from "../features/tasks/tasksSlice";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { useSnackbarContext } from "../contexts/SnackBarContext";
 
 export const DeadlineNotifier: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
   const { t } = useTranslation();
   const [shownNotifications, setShownNotifications] = useState<
@@ -24,11 +27,11 @@ export const DeadlineNotifier: React.FC = () => {
       const minutesToDeadline = dayjs(task.deadline).diff(now, "minute");
 
       if (minutesToDeadline < 0 && task.status !== "expired") {
-        dispatch(updateTaskStatus({ id: task.id, status: "expired" }));
+        dispatch(updateTaskStatusApi({ id: task.id, status: "expired" }));
       }
 
       if (task.status === "deferred" && task.deferredDate === today) {
-        dispatch(updateTaskStatus({ id: task.id, status: "todo" }));
+        dispatch(updateTaskStatusApi({ id: task.id, status: "todo" }));
       }
 
       if (

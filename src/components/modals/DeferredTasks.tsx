@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { RootState } from "../../store/store";
-import { restoreTask } from "../../features/tasks/tasksSlice";
+import { RootState, useAppDispatch } from "../../store/store";
+import { fetchTodos, restoreTaskApi } from "../../features/tasks/tasksSlice";
 import { useThemeContext } from "../../contexts/ThemesContext";
 import { useTranslation } from "react-i18next";
 import {
@@ -26,10 +26,13 @@ type DeferredTasksType = {
 };
 
 const DeferredTasks: React.FC<DeferredTasksType> = ({ onClose }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const deferredTasks = useSelector((state: RootState) =>
     state.tasks.tasks.filter((task) => task.status === "deferred")
   );
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, [dispatch]);
   const { t } = useTranslation();
   const { theme } = useThemeContext();
 
@@ -73,7 +76,7 @@ const DeferredTasks: React.FC<DeferredTasksType> = ({ onClose }) => {
               <Footer>
                 <RestoreButton
                   theme={theme}
-                  onClick={() => dispatch(restoreTask(task.id))}
+                  onClick={() => dispatch(restoreTaskApi(task.id))}
                 >
                   {t("Restoretask")}
                 </RestoreButton>

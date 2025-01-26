@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { RootState } from "../../store/store";
-import { deleteTask } from "../../features/tasks/tasksSlice";
+import { RootState, useAppDispatch } from "../../store/store";
 import { useThemeContext } from "../../contexts/ThemesContext";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,13 +20,14 @@ import {
   RestoreButton,
   Footer,
 } from "../utils/commonStyles";
+import { deleteTaskApi } from "../../features/tasks/tasksSlice";
 
 type DeferredTasksType = {
   onClose: () => void;
 };
 
 const ExpiredTasks: React.FC<DeferredTasksType> = ({ onClose }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const deferredTasks = useSelector((state: RootState) =>
     state.tasks.tasks.filter((task) => task.status === "expired")
   );
@@ -74,7 +74,7 @@ const ExpiredTasks: React.FC<DeferredTasksType> = ({ onClose }) => {
               <Footer>
                 <RestoreButton
                   theme={theme}
-                  onClick={() => dispatch(deleteTask(task.id))}
+                  onClick={() => dispatch(deleteTaskApi(task.id))}
                 >
                   {t("Delete")}
                 </RestoreButton>

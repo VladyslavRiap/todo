@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { arrayMove } from "@dnd-kit/sortable";
-import { TaskType, updateTaskOrder } from "../../features/tasks/tasksSlice";
-import { useDispatch } from "react-redux";
+import { TaskType, updateTaskStatusApi } from "../../features/tasks/tasksSlice";
 import {
   DragEndEvent,
   DragOverEvent,
   DragStartEvent,
-  DndContext,
   PointerSensor,
   TouchSensor,
   MouseSensor,
@@ -18,6 +16,7 @@ import {
   setColumns,
   toggleLock,
 } from "../../features/columns/columnsSlice";
+import { useAppDispatch } from "../../store/store";
 
 export function useDragAndDrop(
   tasksFromRedux: TaskType[],
@@ -28,7 +27,7 @@ export function useDragAndDrop(
   const [activeTask, setActiveTask] = useState<TaskType | null>(null);
   const [tasks, setTasks] = useState<TaskType[]>(tasksFromRedux);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -137,7 +136,12 @@ export function useDragAndDrop(
       if (activeIndex === -1 || overIndex === -1) return;
 
       const updatedTasks = arrayMove(tasks, activeIndex, overIndex);
-      dispatch(updateTaskOrder(updatedTasks));
+      dispatch(
+        updateTaskStatusApi({
+          id: tasks[activeIndex].id,
+          status: updatedTasks[overIndex].status,
+        })
+      );
     } else if (isOverAColumn) {
       const overColumn = columns.find((col) => col.status === overId);
       if (overColumn?.isLock) {

@@ -1,12 +1,20 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import { useDispatch } from "react-redux";
-import { addTask, editTask, TaskType } from "../features/tasks/tasksSlice";
+
+import {
+  addTaskApi,
+  editTaskApi,
+  TaskType,
+} from "../features/tasks/tasksSlice";
 import TaskModal from "../components/modals/TaskModal";
 import ConfirmModal from "../components/modals/ConfirmModal";
 import HistoryModal from "../components/modals/HistoryModal";
 import TaskModalView from "../components/modals/TaskModalView";
 import DefferedTasks from "../components/modals/DeferredTasks";
 import ExpiredTasks from "../components/modals/ExpiredTasks";
+import RegisterModal from "../components/modals/RegisterModal";
+
+import LoginModal from "../components/modals/LoginModal";
+import { useAppDispatch } from "../store/store";
 
 export const TASK_MODAL_ID = "taskModal";
 export const CONFIRM_MODAL_ID = "confirmModal";
@@ -14,6 +22,8 @@ export const HISTORY_MODAL_ID = "historyModal";
 export const TASK_MODAL_VIEW_ID = "taskModalView";
 export const DEFERRED_MODAL_ID = "deferredModal";
 export const EXPIRED_MODAL_ID = "expiredModal";
+export const REGISTER_MODAL_ID = "registerModal";
+export const LOGIN_MODAL_ID = "loginModal";
 export const modalsLookUp: { [key: string]: React.FC<any> } = {
   [TASK_MODAL_ID]: TaskModal,
   [CONFIRM_MODAL_ID]: ConfirmModal,
@@ -21,6 +31,8 @@ export const modalsLookUp: { [key: string]: React.FC<any> } = {
   [TASK_MODAL_VIEW_ID]: TaskModalView,
   [DEFERRED_MODAL_ID]: DefferedTasks,
   [EXPIRED_MODAL_ID]: ExpiredTasks,
+  [REGISTER_MODAL_ID]: RegisterModal,
+  [LOGIN_MODAL_ID]: LoginModal,
 };
 
 interface ModalContextValue {
@@ -40,7 +52,7 @@ interface ModalProviderProps {
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [modal, setModal] = useState<ModalContextValue["modal"]>([]);
   const [taskToEdit, setTaskToEditState] = useState<TaskType | null>(null);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const openModal = (name: string, options: Record<string, any>) => {
     setModal((prev) => [...prev, { name, options }]);
@@ -49,16 +61,24 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const closeModal = (name: string) => {
     setModal((prev) => prev.filter((modal) => modal.name !== name));
   };
-
   const addTaskToList = (task: TaskType, taskToEdit?: TaskType | null) => {
     if (taskToEdit) {
-      dispatch(editTask(task));
+      const updates = {
+        title: task.title,
+        description: task.description,
+        tags: task.tags,
+        deadline: task.deadline,
+        priority: task.priority,
+        deferredDate: task.deferredDate,
+        status: task.status,
+      };
+
+      dispatch(editTaskApi({ id: taskToEdit.id, updates }));
     } else {
-      dispatch(addTask(task));
+      dispatch(addTaskApi(task));
     }
     closeModal(TASK_MODAL_ID);
   };
-
   const handleOverlayClick = (
     e: React.MouseEvent<HTMLDivElement>,
     name: string

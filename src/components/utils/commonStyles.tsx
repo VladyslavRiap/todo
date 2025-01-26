@@ -188,9 +188,10 @@ export const Footer = styled.div`
   }
 `;
 export const Button = styled.button<{
-  variant: "primary" | "secondary";
+  $variant: "primary" | "secondary";
   theme: string;
 }>`
+  width: 100px;
   padding: 10px 20px;
   font-size: 12px;
   font-weight: bold;
@@ -199,8 +200,8 @@ export const Button = styled.button<{
   cursor: pointer;
   transition: background-color 0.3s ease;
 
-  background-color: ${({ variant, theme }) =>
-    variant === "primary"
+  background-color: ${({ $variant, theme }) =>
+    $variant === "primary"
       ? theme === "dark"
         ? "#0056b3"
         : "#007bff"
@@ -210,8 +211,8 @@ export const Button = styled.button<{
   color: #fff;
 
   &:hover {
-    background-color: ${({ variant, theme }) =>
-      variant === "primary"
+    background-color: ${({ $variant, theme }) =>
+      $variant === "primary"
         ? theme === "dark"
           ? "#004080"
           : "#0056b3"
@@ -224,5 +225,14 @@ export const Button = styled.button<{
     width: 90px;
     padding: 12px;
     font-size: 10px;
+  }
+`;
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-direction: row;
+
+  @media (max-width: 768px) {
+    padding-top: 5px;
   }
 `;

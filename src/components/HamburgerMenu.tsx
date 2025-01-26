@@ -9,6 +9,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { useThemeContext } from "../contexts/ThemesContext";
 import useClickOutside from "./utils/otsideClick";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 const MenuWrapper = styled.div`
   position: relative;
@@ -30,7 +32,7 @@ const HamburgerButton = styled.button<{ theme: string }>`
   }
 `;
 
-const DropdownMenu = styled.div<{ isOpen: boolean; theme: string }>`
+const DropdownMenu = styled.div<{ $isOpen: boolean; theme: string }>`
   position: absolute;
   top: 100%;
   left: 0;
@@ -43,7 +45,7 @@ const DropdownMenu = styled.div<{ isOpen: boolean; theme: string }>`
     ${({ theme }) =>
       theme === "light" ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.5)"};
   padding: 10px;
-  display: ${(props) => (props.isOpen ? "block" : "none")};
+  display: ${(props) => (props.$isOpen ? "block" : "none")};
   z-index: 10;
   width: 120px;
   font-size: 12px;
@@ -80,6 +82,7 @@ const HamburgerMenu = () => {
   const { theme } = useThemeContext();
   const { openModal } = useModal();
   const menuRef = useRef<HTMLDivElement>(null);
+  const isAuth = useSelector((state: RootState) => state.auth);
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -97,7 +100,7 @@ const HamburgerMenu = () => {
       >
         ☰
       </HamburgerButton>
-      <DropdownMenu onMouseLeave={closeMenu} theme={theme} isOpen={isOpen}>
+      <DropdownMenu $isOpen={isOpen} onMouseLeave={closeMenu} theme={theme}>
         <MenuItem
           theme={theme}
           onClick={() => {
@@ -110,24 +113,31 @@ const HamburgerMenu = () => {
         >
           {t("addTask")}
         </MenuItem>
-        <MenuItem
-          theme={theme}
-          onClick={() => {
-            openModal(DEFERRED_MODAL_ID, {});
-            closeMenu();
-          }}
-        >
-          {t("deferredTask")}
-        </MenuItem>
-        <MenuItem
-          theme={theme}
-          onClick={() => {
-            openModal(EXPIRED_MODAL_ID, {});
-            closeMenu();
-          }}
-        >
-          {t("expiredTask")}
-        </MenuItem>
+
+        {isAuth.user === null ? (
+          ""
+        ) : (
+          <>
+            <MenuItem
+              theme={theme}
+              onClick={() => {
+                openModal(DEFERRED_MODAL_ID, {});
+                closeMenu();
+              }}
+            >
+              {t("deferredTask")}
+            </MenuItem>
+            <MenuItem
+              theme={theme}
+              onClick={() => {
+                openModal(EXPIRED_MODAL_ID, {});
+                closeMenu();
+              }}
+            >
+              {t("expiredTask")}
+            </MenuItem>
+          </>
+        )}
       </DropdownMenu>
     </MenuWrapper>
   );

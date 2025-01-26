@@ -21,8 +21,8 @@ interface ColumnProps {
 }
 
 const ColumnContainer = styled.div<{
-  isDragging: boolean;
-  isLock: boolean;
+  $isDragging: boolean;
+  $isLock: boolean;
   theme: string;
 }>`
   border-radius: 10px;
@@ -32,22 +32,22 @@ const ColumnContainer = styled.div<{
   height: 100%;
   background-color: ${(props) => (props.theme === "light" ? "#fff" : "#333")};
   border: ${(props) =>
-    props.isDragging ? "2px solid rgb(243, 58, 106)" : "none"};
+    props.$isDragging ? "2px solid rgb(243, 58, 106)" : "none"};
 
-  cursor: ${(props) => (props.isLock ? "default" : "default")};
+  cursor: ${(props) => (props.$isLock ? "default" : "default")};
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: ${(props) =>
-    props.isDragging
+    props.$isDragging
       ? "0px 4px 15px rgba(0, 0, 0, 0.2)"
       : "0px 4px 15px rgba(0, 0, 0, 0.2)"};
-  border-radius: ${(props) => (props.isDragging ? "8px" : "none")};
+  border-radius: ${(props) => (props.$isDragging ? "8px" : "none")};
   padding: 10px;
 
   @media (max-width: 768px) {
     padding: 8px;
     margin-bottom: 16px;
     min-height: 200px;
-    max-height: ${(props) => (props.isDragging ? "60px" : "100%")};
+    max-height: ${(props) => (props.$isDragging ? "60px" : "100%")};
   }
 `;
 
@@ -85,8 +85,11 @@ export const IconContainer = styled.div<{ theme: string }>`
   }
 `;
 
-export const DragIconContainer = styled.div<{ theme: string; isLock: boolean }>`
-  cursor: ${(props) => (props.isLock ? "default" : "grab")};
+export const DragIconContainer = styled.div<{
+  theme: string;
+  $isLock: boolean;
+}>`
+  cursor: ${(props) => (props.$isLock ? "default" : "grab")};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -232,9 +235,9 @@ const Column: React.FC<ColumnProps> = ({
         ref={setNodeRef}
         {...attributes}
         {...listeners}
-        isDragging={isDragging}
+        $isDragging={isDragging}
         style={style}
-        isLock={isLock}
+        $isLock={isLock}
         theme={theme}
       />
     );
@@ -243,8 +246,8 @@ const Column: React.FC<ColumnProps> = ({
   return (
     <ColumnContainer
       ref={setNodeRef}
-      isDragging={isDragging}
-      isLock={isLock}
+      $isDragging={isDragging}
+      $isLock={isLock}
       style={style}
       theme={theme}
     >
@@ -264,7 +267,7 @@ const Column: React.FC<ColumnProps> = ({
           {...attributes}
           {...listeners}
           theme={theme}
-          isLock={isLock}
+          $isLock={isLock}
         >
           <MdOutlineDragIndicator
             size={20}

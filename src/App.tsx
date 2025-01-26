@@ -2,14 +2,14 @@ import { useMemo, useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import Column from "./components/Column";
-import { TaskType } from "./features/tasks/tasksSlice";
-
+import { fetchTodos, TaskType } from "./features/tasks/tasksSlice";
+import CircularProgress from "@mui/material/CircularProgress";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import Task from "./components/Task";
-import { useSelector } from "react-redux";
-import { RootState } from "./store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./store/store";
 import { useDragAndDrop } from "./components/utils/dragAndDrop";
 import FilterMenu from "./components/FilterMenu";
 import { filterTasks } from "./components/utils/filteringTask";
@@ -18,6 +18,9 @@ import { DeadlineNotifier } from "./components/DeadLineNotice";
 
 import HamburgerMenu from "./components/HamburgerMenu";
 import ThemeToggle from "./components/ThemeToggle";
+import { useSnackbarContext } from "./contexts/SnackBarContext";
+import LoginRegister from "./components/LoginRegister";
+import { ButtonContainer } from "./components/utils/commonStyles";
 
 const AppContainer = styled.div`
   padding: 16px;
@@ -41,6 +44,10 @@ const Header = styled.div`
 
   @media (max-width: 768px) {
   }
+`;
+const ContrainerSpinner = styled.div`
+  display: flex;
+  justify-content: center;
 `;
 
 const ColumnContainer = styled.div`
@@ -74,19 +81,13 @@ const ColumnWrapper = styled.div`
     width: 100%;
   }
 `;
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-direction: row;
-
-  @media (max-width: 768px) {
-    padding-top: 5px;
-  }
-`;
 
 const App = () => {
   const { t } = useTranslation();
-
+  const { status, error } = useSelector((state: RootState) => state.tasks);
+  const auth = useSelector((state: RootState) => state.auth);
+  const dispatch: AppDispatch = useDispatch();
+  const { showMessage } = useSnackbarContext();
   const columnsFromRedux = useSelector(
     (state: RootState) => state.columns.columns
   );
@@ -110,7 +111,11 @@ const App = () => {
   } = useDragAndDrop(filteredTasks, columnsFromRedux);
 
   const columnsId = useMemo(() => columns.map((col) => col.status), [columns]);
-
+  useEffect(() => {
+    if (auth.token) {
+      dispatch(fetchTodos());
+    }
+  }, [auth.token]);
   useEffect(() => {
     setTasks(filteredTasks);
   }, [filteredTasks]);
@@ -125,11 +130,17 @@ const App = () => {
       <Header>
         <HamburgerMenu />
         <ButtonContainer>
+          <LoginRegister />
           <FilterMenu setFilters={setFilters} />
           <LanguageSwitcher />
           <ThemeToggle />
         </ButtonContainer>
       </Header>
+      <ContrainerSpinner>
+        {status === "loading" && <CircularProgress size="100px" />}
+        {error && showMessage(` ${error}`, "error")}
+      </ContrainerSpinner>
+
       <DndContainer>
         <DndContext
           sensors={sensors}
@@ -162,7 +173,7 @@ const App = () => {
                   onClickLock={onClickLock}
                   column={activeColumn}
                   status={activeColumn.status}
-                  title={t(`columns.${activeColumn.status}`)}
+                  title={activeColumn.status}
                   isLock={activeColumn.isLock}
                   tasks={tasks.filter(
                     (task) => task.status === activeColumn.status

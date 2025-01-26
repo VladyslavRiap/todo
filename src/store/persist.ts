@@ -4,7 +4,7 @@ import storage from "redux-persist/es/storage";
 const persistConfig: PersistConfig<any> = {
   key: "root",
   storage,
-  whitelist: ["tasks", "columns"],
+  whitelist: ["columns", "tasks"],
 };
 
 export default persistConfig;

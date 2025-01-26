@@ -1,17 +1,17 @@
 {
-  "addTask": "Добавить задачу",
+  "addTask": "Добавить новую задачу",
   "newTask": "Новая задача",
   "buttonAdd": "Добавить задачу",
   "filters": "Фильтры",
 
   "taskName": "Название задачи",
   "description": "Описание",
-  "deadline": "Срок выполнения",
+  "deadline": "До",
   "priority": "Приоритет",
   "cancel": "Отмена",
   "error": {
     "titleRequired": "Название обязательно.",
-    "deadlinePast": "Срок выполнения не может быть в прошлом."
+    "deadlinePast": "Срок не может быть в прошлом."
   },
   "confirm": {
     "message": "Подтвердить изменения?",
@@ -20,10 +20,10 @@
   "columns": {
     "todo": "К выполнению",
     "inProgress": "В процессе",
-    "done": "Выполнено"
+    "done": "Готово"
   },
-  "lockColumn": "Заблокировать колонку",
-  "unlockColumn": "Разблокировать колонку",
+  "lockColumn": "Закрепить колонку",
+  "unlockColumn": "Открепить колонку",
   "sortBy": "Сортировать по",
   "editTask": "Редактировать задачу",
   "edit": "Редактировать",
@@ -31,13 +31,13 @@
   "delete": "Удалить",
   "Work": "Работа",
   "Private": "Личное",
-  "Studying": "Учёба",
+  "Studying": "Учеба",
   "Shopping": "Покупки",
-  "sort": "Сортировка",
+  "sort": "Сортировать",
   "sortLowToHigh": "Сортировать от низкого к высокому",
   "sortHighToLow": "Сортировать от высокого к низкому",
   "reset": "Сбросить",
-  "filterByTags": "Фильтровать по меткам",
+  "filterByTags": "Фильтровать по тегам",
   "filterByDeadline": "Фильтровать по сроку",
   "filterByPriority": "Фильтровать по приоритету",
   "apply": "Применить",
@@ -48,28 +48,28 @@
   },
 
   "close": "Закрыть",
-  "title": "Название",
+  "title": "Заголовок",
 
   "status": "Статус",
   "changeKeys": {
-    "title": "Название: '{{oldValue}}' → '{{newValue}}'",
+    "title": "Заголовок: '{{oldValue}}' → '{{newValue}}'",
     "description": "Описание: '{{oldValue}}' → '{{newValue}}'",
-    "tags": "Метки: '{{oldValue}}' → '{{newValue}}'",
-    "deadline": "Срок выполнения: '{{oldValue}}' → '{{newValue}}'",
+    "tags": "Теги: '{{oldValue}}' → '{{newValue}}'",
+    "deadline": "Срок: '{{oldValue}}' → '{{newValue}}'",
     "priority": "Приоритет: '{{oldValue}}' → '{{newValue}}'",
     "status": "Статус: '{{oldValue}}' → '{{newValue}}'"
   },
   "history": "История",
   "created": "Создано",
-  "noHistory": "История отсутствует",
-  "change": "Изменение",
-  "titleChange": "Название",
-  "tagsChange": "Метки",
+  "noHistory": "Истории нет",
+  "change": "Изменить",
+  "titleChange": "Заголовок",
+  "tagsChange": "Теги",
   "priorityChange": "Приоритет",
   "tags": {
     "Work": "Работа",
     "Private": "Личное",
-    "Studying": "Учёба",
+    "Studying": "Учеба",
     "Shopping": "Покупки"
   },
   "priorityOptions": {
@@ -77,7 +77,7 @@
     "medium": "Средний",
     "high": "Высокий"
   },
-  "dark": "тёмная",
+  "dark": "темная",
   "light": "светлая",
 
   "task": "Задача",
@@ -87,5 +87,17 @@
   "expiredTask": "Просроченные задачи",
   "deferredDate": "Задача будет добавлена",
   "Restoretask": "Восстановить",
-  "Delete": "Удалить"
+  "Delete": "Удалить",
+  "Login": "Войти",
+  "Email": "Электронная почта",
+  "Password": "Пароль",
+  "Cancel": "Отмена",
+  "Register": "Регистрация",
+  "Name": "Имя",
+  "Email is required": "Электронная почта обязательна",
+  "Password is required": "Пароль обязателен",
+  "Invalid credentials": "Неверные учетные данные",
+  "Password must be at least 8 characters long, contain a number, a lowercase and an uppercase letter": "Пароль должен быть не менее 8 символов, содержать цифру, строчную и заглавную букву",
+  "Email already in use": "Электронная почта уже используется",
+  "Registration failed": "Ошибка регистрации"
 }

@@ -8,6 +8,8 @@ import { CONFIRM_MODAL_ID, useModal } from "../../contexts/ModalContext";
 import { useThemeContext } from "../../contexts/ThemesContext";
 import { useSnackbarContext } from "../../contexts/SnackBarContext";
 import { Button, Overlay } from "../utils/commonStyles";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 interface TaskModalProps {
   title?: string;
@@ -195,6 +197,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const { t } = useTranslation();
   const { theme } = useThemeContext();
   const { showMessage } = useSnackbarContext();
+  const isAuth = useSelector((state: RootState) => state.auth);
   useEffect(() => {
     if (taskToEdit) {
       setTaskTitle(taskToEdit.title);
@@ -228,14 +231,24 @@ const TaskModal: React.FC<TaskModalProps> = ({
       tags,
       deadline: deadline ? deadline.format("YYYY-MM-DD HH:mm") : "",
       priority,
-      status,
       deferredDate: deferredDate ? deferredDate.format("YYYY-MM-DD") : "",
+
+      status: taskToEdit
+        ? taskToEdit.status
+        : deferredDate
+        ? "deferred"
+        : "todo",
+      timestampCreateTask: dayjs().format("YYYY-MM-DD HH:mm"),
     };
+
     addTaskToList(newTask, taskToEdit);
-    showMessage(`Task successful ${taskToEdit ? "edit" : "added"}`, "success");
+    showMessage(
+      `Task successfully ${taskToEdit ? "edited" : "added"}`,
+      "success"
+    );
+
     if (onClose) onClose();
   };
-
   const handleEdit = () => {
     if (taskTitle.trim() === "") {
       setError(t("error.titleRequired"));
@@ -330,33 +343,41 @@ const TaskModal: React.FC<TaskModalProps> = ({
           ))}
         </Select>
         <div>
-          <Button
-            theme={theme}
-            variant="secondary"
-            onClick={() => setShowDatePicker(!showDatePicker)}
-          >
-            {t("deferredTask")}
-          </Button>
-
-          {showDatePicker && (
-            <DateTimeContainer>
-              <DateTimeInput
+          {isAuth.user === null ? (
+            ""
+          ) : (
+            <>
+              {" "}
+              <Button
                 theme={theme}
-                type="date"
-                value={deferredDate ? deferredDate.format("YYYY-MM-DD") : ""}
-                onChange={(e) => setDeferredDate(dayjs(e.target.value))}
-              />
-            </DateTimeContainer>
+                $variant="secondary"
+                onClick={() => setShowDatePicker(!showDatePicker)}
+              >
+                {t("deferredTask")}
+              </Button>
+              {showDatePicker && (
+                <DateTimeContainer>
+                  <DateTimeInput
+                    theme={theme}
+                    type="date"
+                    value={
+                      deferredDate ? deferredDate.format("YYYY-MM-DD") : ""
+                    }
+                    onChange={(e) => setDeferredDate(dayjs(e.target.value))}
+                  />
+                </DateTimeContainer>
+              )}
+            </>
           )}
         </div>
 
         <ButtonGroup>
-          <Button theme={theme} variant="secondary" onClick={onClose}>
+          <Button theme={theme} $variant="secondary" onClick={onClose}>
             {t("cancel")}
           </Button>
           <Button
             theme={theme}
-            variant="primary"
+            $variant="primary"
             onClick={taskToEdit ? handleEdit : handleSave}
           >
             {button}

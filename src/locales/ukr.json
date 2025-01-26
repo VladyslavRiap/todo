@@ -1,17 +1,17 @@
 {
-  "addTask": "Додати завдання",
+  "addTask": "Додати нове завдання",
   "newTask": "Нове завдання",
   "buttonAdd": "Додати завдання",
   "filters": "Фільтри",
 
   "taskName": "Назва завдання",
   "description": "Опис",
-  "deadline": "Термін виконання",
+  "deadline": "До",
   "priority": "Пріоритет",
   "cancel": "Скасувати",
   "error": {
-    "titleRequired": "Назва є обов’язковою.",
-    "deadlinePast": "Термін виконання не може бути у минулому."
+    "titleRequired": "Назва обов'язкова.",
+    "deadlinePast": "Термін не може бути в минулому."
   },
   "confirm": {
     "message": "Підтвердити зміни?",
@@ -20,10 +20,10 @@
   "columns": {
     "todo": "До виконання",
     "inProgress": "В процесі",
-    "done": "Виконано"
+    "done": "Завершено"
   },
-  "lockColumn": "Заблокувати колонку",
-  "unlockColumn": "Розблокувати колонку",
+  "lockColumn": "Закріпити колонку",
+  "unlockColumn": "Відкріпити колонку",
   "sortBy": "Сортувати за",
   "editTask": "Редагувати завдання",
   "edit": "Редагувати",
@@ -33,38 +33,38 @@
   "Private": "Особисте",
   "Studying": "Навчання",
   "Shopping": "Покупки",
-  "sort": "Сортування",
+  "sort": "Сортувати",
   "sortLowToHigh": "Сортувати від низького до високого",
   "sortHighToLow": "Сортувати від високого до низького",
   "reset": "Скинути",
-  "filterByTags": "Фільтрувати за мітками",
+  "filterByTags": "Фільтрувати за тегами",
   "filterByDeadline": "Фільтрувати за терміном",
   "filterByPriority": "Фільтрувати за пріоритетом",
   "apply": "Застосувати",
   "deadlines": {
     "1_day": "1 день",
     "7_days": "7 днів",
-    "monthly": "Щомісяця"
+    "monthly": "Щомісячно"
   },
 
   "close": "Закрити",
-  "title": "Назва",
+  "title": "Заголовок",
 
   "status": "Статус",
   "changeKeys": {
-    "title": "Назва: '{{oldValue}}' → '{{newValue}}'",
+    "title": "Заголовок: '{{oldValue}}' → '{{newValue}}'",
     "description": "Опис: '{{oldValue}}' → '{{newValue}}'",
-    "tags": "Мітки: '{{oldValue}}' → '{{newValue}}'",
-    "deadline": "Термін виконання: '{{oldValue}}' → '{{newValue}}'",
+    "tags": "Теги: '{{oldValue}}' → '{{newValue}}'",
+    "deadline": "Термін: '{{oldValue}}' → '{{newValue}}'",
     "priority": "Пріоритет: '{{oldValue}}' → '{{newValue}}'",
     "status": "Статус: '{{oldValue}}' → '{{newValue}}'"
   },
   "history": "Історія",
   "created": "Створено",
-  "noHistory": "Історія відсутня",
-  "change": "Зміна",
-  "titleChange": "Назва",
-  "tagsChange": "Мітки",
+  "noHistory": "Історії немає",
+  "change": "Змінити",
+  "titleChange": "Заголовок",
+  "tagsChange": "Теги",
   "priorityChange": "Пріоритет",
   "tags": {
     "Work": "Робота",
@@ -81,11 +81,23 @@
   "light": "світла",
 
   "task": "Завдання",
-  "deadlineNotification": "Завдання \"{{title}}\" прострочено на {{minutes}} хвилин!",
+  "deadlineNotification": "Завдання \"{{title}}\" прострочене на {{minutes}} хвилин!",
   "deferredTask": "Відкладене завдання",
   "deferredTasks": "Відкладені завдання",
   "expiredTask": "Прострочені завдання",
   "deferredDate": "Завдання буде додано",
   "Restoretask": "Відновити",
-  "Delete": "Видалити"
+  "Delete": "Видалити",
+  "Login": "Увійти",
+  "Email": "Електронна пошта",
+  "Password": "Пароль",
+  "Cancel": "Скасувати",
+  "Register": "Реєстрація",
+  "Name": "Ім'я",
+  "Email is required": "Електронна пошта обов'язкова",
+  "Password is required": "Пароль обов'язковий",
+  "Invalid credentials": "Невірні облікові дані",
+  "Password must be at least 8 characters long, contain a number, a lowercase and an uppercase letter": "Пароль повинен бути не менше 8 символів, містити цифру, малу та велику літеру",
+  "Email already in use": "Електронна пошта вже використовується",
+  "Registration failed": "Помилка реєстрації"
 }

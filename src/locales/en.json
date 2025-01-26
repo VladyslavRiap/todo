@@ -83,5 +83,17 @@
   "expiredTask": "Expired tasks",
   "deferredDate": "Task will be add",
   "Restoretask": "Restore",
-  "Delete": "Delete"
+  "Delete": "Delete",
+  "Login": "Login",
+  "Email": "Email",
+  "Password": "Password",
+  "Cancel": "Cancel",
+  "Register": "Register",
+  "Name": "Name",
+  "Email is required": "Email is required",
+  "Password is required": "Password is required",
+  "Invalid credentials": "Invalid credentials",
+  "Password must be at least 8 characters long, contain a number, a lowercase and an uppercase letter": "Password must be at least 8 characters long, contain a number, a lowercase and an uppercase letter",
+  "Email already in use": "Email already in use",
+  "Registration failed": "Registration failed"
 }

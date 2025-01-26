@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { deleteTask, TaskType } from "../features/tasks/tasksSlice";
+import { deleteTaskApi, TaskType } from "../features/tasks/tasksSlice";
 import {
   HISTORY_MODAL_ID,
   TASK_MODAL_ID,
@@ -11,7 +11,7 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
-import { RootState } from "../store/store";
+import { RootState, useAppDispatch } from "../store/store";
 import { useThemeContext } from "../contexts/ThemesContext";
 import { MdDeleteOutline, MdOutlineDragIndicator } from "react-icons/md";
 import { GoHistory } from "react-icons/go";
@@ -39,33 +39,34 @@ const pulseAnimation = `
 `;
 
 const TaskContainer = styled.div<{
-  isDragging: boolean;
+  $isDragging: boolean;
   cursor: string;
-  deadlineColor: string;
-  pulse: boolean;
+  $deadlineColor: string;
+  $pulse: boolean;
   theme: string;
 }>`
-  transition: ${(props) => (props.isDragging ? "all 0.3s ease" : "none")};
-  transform: ${(props) => (props.isDragging ? "scale(1.02)" : "none")};
-  opacity: ${(props) => (props.isDragging ? 0.9 : 1)};
+  transition: ${(props) => (props.$isDragging ? "all 0.3s ease" : "none")};
+  transform: ${(props) => (props.$isDragging ? "scale(1.02)" : "none")};
+  opacity: ${(props) => (props.$isDragging ? 0.9 : 1)};
   box-shadow: ${(props) =>
-    props.isDragging
+    props.$isDragging
       ? "0px 4px 15px rgba(0, 0, 0, 0.1)"
       : "0px 2px 5px rgba(0, 0, 0, 0.2)"};
   border: ${(props) =>
-    props.isDragging ? "1px solid red" : "1px solid #ddd;"};
+    props.$isDragging ? "1px solid red" : "1px solid #ddd;"};
   border-radius: 8px;
   margin-bottom: 7px;
+
   cursor: ${(props) => props.cursor};
   overflow: hidden;
   background: ${(props) =>
-    props.deadlineColor === "yellow"
+    props.$deadlineColor === "yellow"
       ? "#FFF3CD"
       : props.theme === "light"
       ? "#ffffff"
       : "#2C2C2C"};
-  height: ${(props) => (props.isDragging ? "170px" : "")};
-  animation: ${(props) => (props.pulse ? `pulse 5s infinite` : "none")};
+  height: ${(props) => (props.$isDragging ? "170px" : "")};
+  animation: ${(props) => (props.$pulse ? `pulse 5s infinite` : "none")};
   ${pulseAnimation}
 
   touch-action: none;
@@ -105,13 +106,15 @@ const TaskContent = styled.div<{ theme: string }>`
   }
 `;
 
-const TitleContainer = styled.div`
-  display: grid;
+const TitleContainer = styled.div<{ $isAuth: boolean }>`
+  display: ${(props) => (props.$isAuth ? "grid" : "flex")};
+  justify-content: space-between;
   grid-template-columns: 2fr 0.4fr 0.4fr;
   align-items: center;
   margin-bottom: 8px;
 
   @media (max-width: 768px) {
+    grid-template-columns: 1fr 0.5fr 0.5fr;
   }
 `;
 
@@ -197,16 +200,16 @@ export const DragIconContainer = styled.div<{ theme: string }>`
 
 const Task: React.FC<TaskProps> = ({ task, isSorted }) => {
   const { openModal } = useModal();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const notifiedTaskIds = useSelector(
     (state: RootState) => state.tasks.notifiedTaskIds
   );
   const { showMessage } = useSnackbarContext();
   const { theme } = useThemeContext();
-
+  const isAuth = useSelector((state: RootState) => state.auth);
   const handleDelete = () => {
-    dispatch(deleteTask(task.id));
+    dispatch(deleteTaskApi(task.id));
     showMessage(`Task ${task.title} deleted`, "error");
   };
 
@@ -271,10 +274,10 @@ const Task: React.FC<TaskProps> = ({ task, isSorted }) => {
         {...attributes}
         {...listeners}
         style={style}
-        isDragging={isDragging}
+        $isDragging={isDragging}
         cursor={cursorStyle}
-        deadlineColor={deadlineColor}
-        pulse={pulseEffect}
+        $deadlineColor={deadlineColor}
+        $pulse={pulseEffect}
         theme={theme}
       />
     );
@@ -284,32 +287,39 @@ const Task: React.FC<TaskProps> = ({ task, isSorted }) => {
     <TaskContainer
       ref={setNodeRef}
       style={style}
-      isDragging={isDragging}
+      $isDragging={isDragging}
       cursor={cursorStyle}
-      deadlineColor={deadlineColor}
-      pulse={pulseEffect}
+      $deadlineColor={deadlineColor}
+      $pulse={pulseEffect}
       theme={theme}
     >
       <PriorityBar color={getPriorityColor(task.priority)} />
       <TaskContent theme={theme}>
-        <TitleContainer>
+        <TitleContainer $isAuth={!!isAuth.user}>
           <TaskTitle onClick={handleModalView} theme={theme}>
             {task.title}
           </TaskTitle>
-          <IconContainer onClick={handleHistory} theme={theme}>
-            <GoHistory />
-          </IconContainer>
-
-          {!isSorted ? (
-            <DragIconContainer {...attributes} {...listeners} theme={theme}>
-              <MdOutlineDragIndicator
-                size={20}
-                color={theme === "light" ? "#333" : "#fff"}
-              />
-            </DragIconContainer>
-          ) : (
-            ""
-          )}
+          <>
+            {isAuth.user === null ? (
+              ""
+            ) : (
+              <>
+                <IconContainer onClick={handleHistory} theme={theme}>
+                  <GoHistory />
+                </IconContainer>
+              </>
+            )}
+            {!isSorted ? (
+              <DragIconContainer {...attributes} {...listeners} theme={theme}>
+                <MdOutlineDragIndicator
+                  size={20}
+                  color={theme === "light" ? "#333" : "#fff"}
+                />
+              </DragIconContainer>
+            ) : (
+              ""
+            )}
+          </>
         </TitleContainer>
 
         {task.deadline && (
@@ -331,10 +341,13 @@ const Task: React.FC<TaskProps> = ({ task, isSorted }) => {
         <IconContainer onClick={handleDelete} theme={theme}>
           <MdDeleteOutline color="red" />
         </IconContainer>
-
-        <IconContainer onClick={handleEdit} theme={theme}>
-          <CiEdit color="green" />
-        </IconContainer>
+        {isAuth.user === null ? (
+          ""
+        ) : (
+          <IconContainer onClick={handleEdit} theme={theme}>
+            <CiEdit color="green" />
+          </IconContainer>
+        )}
       </TaskActions>
     </TaskContainer>
   );

@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   display: inline-block;
 `;
 
-const Menu = styled.ul<{ theme: string; isOpen: boolean }>`
+const Menu = styled.ul<{ theme: string; $isOpen: boolean }>`
   position: absolute;
   top: 60%;
   left: 0;
@@ -23,7 +23,7 @@ const Menu = styled.ul<{ theme: string; isOpen: boolean }>`
     ${({ theme }) =>
       theme === "light" ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.5)"};
   padding: 10px;
-  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
+  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
   z-index: 10;
   width: 120px;
   font-size: 14px;
@@ -75,13 +75,13 @@ const LanguageSwitcher: React.FC = () => {
   return (
     <Wrapper ref={menuRef}>
       <Button
-        variant={theme === "light" ? "primary" : "secondary"}
+        $variant={theme === "light" ? "primary" : "secondary"}
         onClick={toggleMenu}
         theme={theme}
       >
         {currentLanguage}
       </Button>
-      <Menu isOpen={isOpen} theme={theme}>
+      <Menu $isOpen={isOpen} theme={theme}>
         <MenuItem onClick={() => changeLanguage("en")} theme={theme}>
           English
         </MenuItem>

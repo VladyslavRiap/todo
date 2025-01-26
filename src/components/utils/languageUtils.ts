@@ -46,11 +46,10 @@ export const getLocalizedValue = (
   return value;
 };
 
-export const translateTags = (tags: string, t: TFunction) => {
-  if (!tags || tags.trim().length === 0) return "";
-  return tags
+export const translateTags = (value: string, t: TFunction): string => {
+  return value
     .split(",")
-    .map((tag) => getLocalizedValue(tag.trim(), t, "tags")) //
+    .map((tag) => t(`tags.${tag.trim()}`) || tag.trim())
     .join(", ");
 };
 
@@ -61,7 +60,6 @@ export const updateTaskField = <K extends keyof TaskType>(
   changes: string[]
 ): boolean => {
   const oldValue = task[key];
-
   const isEmptyValue = (value: any) => {
     if (typeof value === "string") {
       return value.trim() === "";
@@ -70,9 +68,7 @@ export const updateTaskField = <K extends keyof TaskType>(
     }
     return false;
   };
-
   const isDescriptionField = key === "description" || key === "title";
-
   if (
     newValue !== undefined &&
     newValue !== oldValue &&
@@ -85,10 +81,8 @@ export const updateTaskField = <K extends keyof TaskType>(
       }
       return value;
     };
-
     const formattedOldValue = formatValue(oldValue, isDescriptionField);
     const formattedNewValue = formatValue(newValue, isDescriptionField);
-
     const change = `${key}: ${formattedOldValue} → ${formattedNewValue}`;
     changes.push(change);
     task[key] = newValue;

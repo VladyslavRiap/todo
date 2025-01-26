@@ -28,8 +28,8 @@ const Container = styled.div`
   position: relative;
 `;
 
-const Menu = styled.div<{ isOpen: boolean; theme: string }>`
-  display: ${({ isOpen }) => (isOpen ? "flex" : "none")};
+const Menu = styled.div<{ $isOpen: boolean; theme: string }>`
+  display: ${({ $isOpen }) => ($isOpen ? "flex" : "none")};
   flex-direction: column;
   position: absolute;
   background-color: ${(props) => (props.theme === "light" ? "#fff" : "#222")};
@@ -198,13 +198,13 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ setFilters }) => {
   return (
     <Container ref={menuRef}>
       <Button
-        variant={theme === "light" ? "primary" : "secondary"}
+        $variant={theme === "light" ? "primary" : "secondary"}
         onClick={toggleMenu}
         theme={theme}
       >
         {t("filters")}
       </Button>
-      <Menu isOpen={isOpen} theme={theme}>
+      <Menu $isOpen={isOpen} theme={theme}>
         <Section>
           <SectionTitle theme={theme}>{t("filterByTags")}</SectionTitle>
           {tags.map((tag) => (

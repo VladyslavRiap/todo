@@ -61,10 +61,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <ModalBox theme={theme}>
         <Title theme={theme}>{message}</Title>
         <ButtonContainer>
-          <Button theme={theme} variant="secondary" onClick={onCancel}>
+          <Button theme={theme} $variant="secondary" onClick={onCancel}>
             {t("cancel")}
           </Button>
-          <Button theme={theme} variant="primary" onClick={onConfirm}>
+          <Button theme={theme} $variant="primary" onClick={onConfirm}>
             {t("confirm.confirm")}
           </Button>
         </ButtonContainer>
